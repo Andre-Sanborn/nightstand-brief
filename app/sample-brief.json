@@ -1,0 +1,21 @@
+{
+  "rows": [
+    { "section": "meta", "ord": 0, "day": "Tuesday · March 3 2026", "time": "Ready 5:30 AM", "title": "A quiet morning, then the dentist at two — and the library books are due." },
+    { "section": "todo", "ord": 0, "tag": "Today", "title": "Return the library books", "detail": "Three books are due at the Maple Street branch by closing time." },
+    { "section": "todo", "ord": 1, "tag": "Friday", "title": "Send Jordan the trip packing list", "detail": "Jordan asked on Sunday and is waiting on it before buying gear." },
+    { "section": "cal", "ord": 0, "day": "Today · Tue Mar 3", "time": "2 – 2:45 PM", "title": "Dentist cleaning", "detail": "Dr. Okafor, Elm Street office" },
+    { "section": "cal", "ord": 1, "day": "Today · Tue Mar 3", "time": "6:30 PM", "title": "Dinner with Sam and Priya" },
+    { "section": "cal", "ord": 2, "day": "Wed Mar 4", "time": "All day", "title": "Recycling pickup" },
+    { "section": "wx", "ord": 0, "day": "Tue", "title": "Partly sunny", "hi": 52, "lo": 34, "pop": 10 },
+    { "section": "wx", "ord": 1, "day": "Wed", "title": "Rain", "hi": 47, "lo": 36, "pop": 80 },
+    { "section": "wx", "ord": 2, "day": "Thu", "title": "Showers", "hi": 45, "lo": 33, "pop": 60 },
+    { "section": "wx", "ord": 3, "day": "Fri", "title": "Mostly cloudy", "hi": 48, "lo": 31, "pop": 20 },
+    { "section": "wx_note", "ord": 0, "detail": "Dry today, then rain moves in Wednesday morning and lingers through Thursday.", "source": "Sample forecast" },
+    { "section": "news", "ord": 0, "id": "sample-chip-plant", "topic": "AI & tech", "title": "A sample chip maker opens a new plant", "detail": "This is an invented story that stands in for the first news item.", "source": "Sample Wire" },
+    { "section": "news", "ord": 1, "id": "sample-rate-hold", "topic": "Markets & economy", "title": "A sample central bank holds rates steady", "detail": "This is an invented story that stands in for the second news item.", "source": "Sample Wire" },
+    { "section": "news", "ord": 2, "id": "sample-cave-survey", "topic": "Outdoors, caving & Idaho", "title": "Volunteers finish a sample cave survey", "detail": "This is an invented story that stands in for the third news item.", "source": "Sample Wire" },
+    { "section": "ai", "ord": 0, "tag": "New", "title": "A sample release note", "detail": "An invented product update, shown on screen only." },
+    { "section": "email", "ord": 0, "title": "Jordan asked about the packing list", "detail": "An invented message, shown on screen only." },
+    { "section": "tip", "ord": 0, "tag": "iPad", "title": "Swipe down from the top right", "detail": "Opens Control Centre, where the brightness slider is." }
+  ]
+}
