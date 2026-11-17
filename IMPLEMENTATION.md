@@ -16,15 +16,26 @@ Run the tests with `npm test`. Serve the app locally with `npm run serve`.
 ## The night, step by step
 
 1. The owner opens the app from the Home Screen and taps **Arm**.
-2. That tap starts the audio engine, asks for the screen wake lock, and stores
-   the alarm time.
-3. The clock shows the time in dim red on black. Its position shifts a few
+2. That tap stores the alarm time, starts the audio engine, asks for the screen
+   wake lock, and plays a chime.
+3. A chime check asks whether the owner heard it. The answer is logged and does
+   not change the alarm. "Turn alarm off" there disarms. With no answer in two
+   minutes the check closes and logs "chime not confirmed".
+4. The clock shows the time in dim red on black. Its position shifts a few
    pixels each minute so a static image does not burn into the screen.
-4. The page checks the clock once a second. When the time passes the alarm time,
-   the tone starts and grows louder over 30 seconds.
-5. A tap stops the tone. The same tap is the user gesture that lets the page
+5. The page checks the clock once a second. At the alarm time the tone starts
+   and grows louder over 30 seconds.
+6. A tap stops the tone. The same tap is the user gesture that lets the page
    speak, so the greeting starts from inside that tap handler.
-6. The brief view opens for scrolling and voting.
+7. The brief view opens for scrolling and voting.
+
+Late and missed alarms:
+
+- A page that resumes up to 60 minutes after the alarm time rings and logs how
+  late it was. Later than that, it disarms and logs a missed alarm.
+- A page that was reloaded and never re-armed shows the flashing alarm screen at
+  the alarm time, with no tone, and logs it.
+- A time already past is never stored as an alarm.
 
 ## iPad behaviour the design depends on
 
@@ -49,6 +60,8 @@ What the page does about each risk:
 - **A stalled audio context.** One inaudible oscillator runs from the Arm tap so
   the context stays in use. Every state change is logged. When the context
   leaves `running` the page tries `resume()`, then `suspend()` and `resume()`.
+  Each attempt gets three seconds. A stop tap during recovery cancels the
+  pending tone.
 - **No sound at alarm time.** The alarm screen flashes bright red. A flash will
   not wake a sleeper, so the owner keeps a backup alarm in the Clock app until
   device test 2 has passed on several nights.
@@ -57,8 +70,8 @@ What the page does about each risk:
   loads after the alarm time logs a missed alarm.
 - **Speech.** The tone stops before speech starts. The first utterance is queued
   inside the stop tap. Each line is its own utterance, chained on `onend`, with
-  a timer that moves on if `onend` never fires. The default voice is used, so
-  nothing waits on the voice list.
+  a timer that moves on if `onend` never fires. Stopping a reading clears that
+  timer. The default voice is used, so nothing waits on the voice list.
 
 The page keeps a night log in the browser's storage: when it was armed, each
 time the page was hidden or the wake lock dropped, each audio state change, and
@@ -74,12 +87,17 @@ when the tone started. The log is how a device test is read the next morning.
 ## Checks
 
 - `npm test` runs the pure logic in `app/core/`.
-- The page was driven through a simulated night in headless Chromium with a fake
-  clock on 2026-11-17: arm at 10:15 PM, no ring at 6:29:59, ring at 6:30:00, stop
-  tap, all fourteen sample lines spoken in order, a vote stored, and the re-arm
-  screen after a reload. That script is not in the repository because it needs
-  Playwright, which would be the first dependency. Chromium says nothing about
-  iPadOS audio, speech or wake lock behaviour.
+- The page is driven through simulated nights in headless Chromium with a fake
+  clock and a stubbed speech engine. Last run 2026-11-17, all passing: no ring at
+  6:29:59 and a ring at 6:30:00 without the chime check answered; no ring
+  returning after the stop tap; a brief changed at 6:25 spoken at 6:30; the
+  alarm screen shown after an unanswered reload; no ring and a logged miss when
+  the clock jumps to 2:00 PM; a second reading after "Stop reading" speaking
+  every line once; and load, failure and stale cases against a mocked GitHub.
+  The scripts are not in the repository because they need Playwright, which
+  would be the first dependency. Chromium says nothing about iPadOS audio,
+  speech or wake lock behaviour.
+- Each of twelve deliberate faults in `app/core/` fails `npm test`.
 
 ## Brief format
 
@@ -100,6 +118,11 @@ Two additions for this app:
 The spoken script is composed in `app/core/` from the rows, in this order:
 greeting, headline, to-dos, today's calendar, today's weather, news. Email, AI
 notes and tips are on screen only.
+
+- Only calendar rows whose `day` begins with the word "Today" are read.
+- An en or em dash between times or numbers is read "to". A hyphen is read "to"
+  only with spaces on both sides, so phone numbers and dates are left alone.
+- A to-do with a blank title is neither counted nor read.
 
 The full contract for whoever writes the file is in
 [`generator/README.md`](generator/README.md). `app/core/validate.js` checks a
@@ -145,9 +168,12 @@ The owner chose this route on 2026-11-17 because it costs nothing.
 - The owner types that repository's name and a read-only token into the app's
   "Brief source" screen. The app stores both in the browser and fetches the file
   from the GitHub contents API. With no source set, the app shows the sample.
-- While an alarm is set the app refetches every ten minutes, so a brief written
-  before the alarm is picked up without a tap.
-- The `meta` row carries `date` as `YYYY-MM-DD` in the owner's local time. A
+- While an alarm is set the app refetches every ten minutes, and every two
+  minutes in the last fifteen minutes before the alarm. The ring also starts a
+  fetch without waiting for it. The stop tap reads whatever rows have arrived.
+- The `meta` row carries `date` as `YYYY-MM-DD` in the owner's local time. The
+  app judges it by its leading `YYYY-MM-DD`; the checker accepts only the plain
+  date. A
   brief dated another day is not read aloud; the greeting says the brief has not
   arrived, and the brief view shows a notice.
 - A failed fetch keeps the rows already loaded and logs the failure.

@@ -1,4 +1,11 @@
 let run = 0;
+// Module-level so stopping one reading clears its timer before the next reading starts.
+let watchdog = null;
+
+function clearWatchdog() {
+  clearTimeout(watchdog);
+  watchdog = null;
+}
 
 export function canSpeak() {
   return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
@@ -6,6 +13,7 @@ export function canSpeak() {
 
 export function stopSpeaking() {
   run += 1;
+  clearWatchdog();
   if (canSpeak()) window.speechSynthesis.cancel();
 }
 
@@ -23,11 +31,11 @@ export function speak(lines, { onLine = () => {}, onDone = () => {}, onEvent = (
     const at = index;
     index += 1;
     let finished = false;
-    let watchdog = null;
+    // A cancelled line can still fire onend or onerror; it must not touch the next reading.
     const advance = (why) => {
-      if (finished) return;
+      if (finished || mine !== run) return;
       finished = true;
-      clearTimeout(watchdog);
+      clearWatchdog();
       if (why) onEvent(`speech line ${at + 1}: ${why}`);
       next();
     };
@@ -36,12 +44,13 @@ export function speak(lines, { onLine = () => {}, onDone = () => {}, onEvent = (
     utterance.onend = () => advance('');
     utterance.onerror = (e) => advance(`error ${e.error || ''}`.trim());
     onLine(at, line);
-    window.speechSynthesis.speak(utterance);
     // Some iPadOS versions never fire onend; move on rather than stall the brief.
+    // Set before speak(), in case onend fires synchronously and the next line starts first.
     watchdog = setTimeout(() => {
       window.speechSynthesis.cancel();
       advance('no end event');
     }, 6000 + line.length * 110);
+    window.speechSynthesis.speak(utterance);
   };
   next();
 }

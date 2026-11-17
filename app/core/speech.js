@@ -9,9 +9,11 @@ const MAX_TODOS = 4;
 const MAX_NEWS = 3;
 
 // Rewrites symbols a speech voice reads badly or skips.
+// A hyphen is a range only with spaces around it, so "208-555-0142" and "2026-11-18" survive.
 export function forEar(value) {
   return text(value)
-    .replace(/(\d|[AP]M)\s*[–—-]\s*(\d)/g, '$1 to $2')
+    .replace(/(\d|[AP]M)\s*[–—]\s*(\d)/g, '$1 to $2')
+    .replace(/(\d|[AP]M)\s+-\s+(\d)/g, '$1 to $2')
     .replace(/\s*[–—]\s*/g, ', ')
     .replace(/\s*·\s*/g, ', ')
     .replace(/(\d)\s*%/g, '$1 percent')
@@ -33,7 +35,8 @@ function greeting(meta, now) {
   return `Good morning. It's ${WEEKDAYS[now.getDay()]}, ${MONTHS[now.getMonth()]} ${now.getDate()}.`;
 }
 
-function todoLines(rows) {
+function todoLines(all) {
+  const rows = all.filter((r) => text(r.title));
   if (!rows.length) return ['Nothing needs you this morning.'];
   const shown = rows.slice(0, MAX_TODOS);
   const count = rows.length === 1 ? 'You have 1 to-do.' : `You have ${rows.length} to-dos.`;

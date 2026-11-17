@@ -26,7 +26,9 @@ function localDate(now) {
 }
 
 // A brief with no date cannot be judged, so it is treated as current.
+// A time after the date, as in "2026-11-18T05:30:00-07:00", is ignored.
 export function isStale(meta, now) {
   const date = String((meta && meta.date) || '').trim();
-  return date !== '' && date !== localDate(now);
+  const leading = /^(\d{4}-\d{2}-\d{2})(?!\d)/.exec(date);
+  return date !== '' && (leading ? leading[1] : date) !== localDate(now);
 }

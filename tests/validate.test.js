@@ -138,6 +138,14 @@ test('warning: no cal row whose day starts with Today', () => {
   assert.deepEqual(result.warnings, ['No cal row has a day starting with "Today".']);
 });
 
+test('warning: a cal day of "Todayish" is not today', () => {
+  const result = validateBrief(brief((rows) => [
+    ...rows.filter((r) => r.section !== 'cal'),
+    { section: 'cal', ord: 0, day: 'Todayish', time: '9 AM', title: 'Standup' },
+  ]), morning);
+  assert.deepEqual(result.warnings, ['No cal row has a day starting with "Today".']);
+});
+
 test('a "Nothing scheduled" row for today satisfies the calendar check', () => {
   const result = validateBrief(brief((rows) => [
     ...rows.filter((r) => r.section !== 'cal'),

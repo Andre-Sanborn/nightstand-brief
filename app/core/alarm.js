@@ -20,6 +20,25 @@ export function isDue(nowMs, alarmMs) {
   return nowMs >= alarmMs;
 }
 
+const MINUTE = 60_000;
+export const MISSED_AFTER_MINUTES = 60;
+
+// A page frozen overnight and resumed much later should not ring in the afternoon.
+export function dueAction(nowMs, alarmMs) {
+  if (nowMs < alarmMs) return 'wait';
+  return nowMs - alarmMs > MISSED_AFTER_MINUTES * MINUTE ? 'missed' : 'ring';
+}
+
+export function minutesLate(nowMs, alarmMs) {
+  return Math.max(0, Math.floor((nowMs - alarmMs) / MINUTE));
+}
+
+// Refreshes faster just before the alarm, so a brief written late is still picked up.
+export function refreshEvery(nowMs, alarmMs) {
+  const ahead = alarmMs - nowMs;
+  return ahead >= 0 && ahead <= 15 * MINUTE ? 2 * MINUTE : 10 * MINUTE;
+}
+
 export function formatClock(date) {
   const h24 = date.getHours();
   const h = h24 % 12 === 0 ? 12 : h24 % 12;

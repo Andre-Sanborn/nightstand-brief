@@ -28,3 +28,9 @@ test('an unknown vote changes nothing and other stories are kept', () => {
   assert.equal(voteFor(applyVote(votes, story, 'up', 't1'), 'other'), 'up');
   assert.equal(voteFor(votes, 's1'), null);
 });
+
+test('a story without a topic or title is stored with empty strings', () => {
+  assert.deepEqual(applyVote([], { id: 's2' }, 'down', 't1'), [
+    { id: 's2', topic: '', title: '', vote: 'down', at: 't1' },
+  ]);
+});

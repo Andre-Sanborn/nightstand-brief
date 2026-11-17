@@ -17,12 +17,15 @@ task must write. `app/core/validate.js` checks a brief against it.
 ## Timing
 
 - The file must be written before 6:00 AM Mountain time. The alarm normally
-  rings between 6:00 and 7:00 AM, and the app refetches every ten minutes while
-  it is armed.
+  rings between 6:00 and 7:00 AM, and while it is armed the app refetches every ten
+  minutes, and every two minutes in the last fifteen minutes before the alarm.
 - `meta.date` is the date of the morning the brief is for, in Mountain local
   time, written `YYYY-MM-DD`. The app refuses to read a brief whose date is not
   the iPad's local date. Do not use the UTC date: at 11 PM Mountain it is
   already tomorrow in UTC.
+- The app also reads a `meta.date` with a time after the date, such as
+  `2026-03-03T05:20:00-07:00`, and uses only the date part. Write the plain
+  date: the checker accepts only `YYYY-MM-DD`.
 
 ## Rows
 
@@ -59,7 +62,7 @@ section is ignored.
 
 | Field | Required | Use |
 |---|---|---|
-| `day` | Yes | Starts with "Today" for today's events, such as "Today · Tue Mar 3". Only rows whose `day` starts with "Today" are read aloud. Later days are shown. |
+| `day` | Yes | Begins with the word "Today" for today's events, such as "Today · Tue Mar 3". Only rows whose `day` begins with the word "Today" are read aloud; "Todayish" does not count. Later days are shown. |
 | `time` | No | Such as "2 PM", "2 to 2:45 PM" or "All day". Read aloud before the title. |
 | `title` | Yes | The event, such as "Dentist cleaning". Read aloud for today's events. |
 | `detail` | No | Place or people. Shown. |

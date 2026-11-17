@@ -2,9 +2,11 @@ let ctx = null;
 let ringTimer = null;
 let ringStartedAt = 0;
 let recovering = false;
+let ringGeneration = 0;
 let report = () => {};
 
 const RAMP_SECONDS = 30;
+const SETTLE_MS = 3000;
 
 export function engineState() {
   return ctx ? ctx.state : 'none';
@@ -36,16 +38,30 @@ export async function startEngine(onEvent) {
   return ctx.state;
 }
 
+// A resume() or suspend() that never settles would otherwise block every later recovery.
+async function settle(step) {
+  let timer = null;
+  const timeout = new Promise((resolve) => { timer = setTimeout(() => resolve('timeout'), SETTLE_MS); });
+  try {
+    if (await Promise.race([ctx[step](), timeout]) === 'timeout') report(`audio ${step} did not settle in 3 seconds`);
+  } catch { /* the state check after each step decides what happens next */ } finally {
+    clearTimeout(timer);
+  }
+}
+
 // An interrupted context can refuse resume() until it has been suspended first.
 async function recover() {
   if (!ctx || recovering || ctx.state === 'running') return;
   recovering = true;
-  try { await ctx.resume(); } catch { /* tried below */ }
-  if (ctx.state !== 'running') {
-    try { await ctx.suspend(); } catch { /* nothing more to try */ }
-    try { await ctx.resume(); } catch { /* reported by the caller */ }
+  try {
+    await settle('resume');
+    if (ctx.state !== 'running') {
+      await settle('suspend');
+      await settle('resume');
+    }
+  } finally {
+    recovering = false;
   }
-  recovering = false;
 }
 
 function note(freq, at, length, level) {
@@ -68,10 +84,13 @@ export function chime() {
   note(880, t + 0.25, 0.7, 0.35);
 }
 
+// Returns 'stopped' when stopRing() ran during the wait, so a stop tap is never overridden.
 export async function startRing() {
   if (!ctx) return 'none';
-  await recover();
   stopRing();
+  const mine = ringGeneration;
+  await recover();
+  if (mine !== ringGeneration) return 'stopped';
   ringStartedAt = ctx.currentTime;
   const bar = () => {
     if (ctx.state !== 'running') { recover(); return; }
@@ -87,6 +106,7 @@ export async function startRing() {
 }
 
 export function stopRing() {
+  ringGeneration += 1;
   if (ringTimer) clearInterval(ringTimer);
   ringTimer = null;
 }

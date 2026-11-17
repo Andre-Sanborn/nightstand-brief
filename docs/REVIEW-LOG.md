@@ -4,6 +4,24 @@ Last reviewed commit: bf3158c
 
 Newest entry first.
 
+## 2026-11-17, verification of the first build
+
+Reviewer: adversarial-verifier. Subject: commit 648b3e6.
+
+| Finding | Decision |
+|---|---|
+| A brief published in the last ten minutes before the alarm was not read. | Fixed. Faster refresh before the alarm and a fetch at ring time. |
+| The tone kept ringing when the stop tap landed during audio recovery. | Fixed. |
+| A `resume()` that never settled blocked all later recovery. | Fixed with a three-second limit. |
+| No alarm was set unless the chime check was answered, and an open check could ring twice. | Fixed. The alarm is stored at the Arm tap. |
+| A stopped reading's timer cancelled a line of the next reading. | Fixed. |
+| Phone numbers, dates and model numbers were read as ranges. | Fixed. |
+| A date with a time after it counted as stale. | Fixed in the app. The checker still requires the plain date. |
+| A page resumed hours late rang. | Fixed. More than 60 minutes late is logged as missed. |
+| A reloaded, un-re-armed page passed the alarm time silently. | Fixed. It shows the alarm screen and logs it. |
+| Eleven faults in the core survived the tests. | Fixed. Tests added; all now fail the suite. |
+| Privacy and security. | Nothing found. |
+
 ## 2026-11-17, plan review before the first build
 
 Reviewer: strategy-adversary. Subject: the plan in MISSION.md and

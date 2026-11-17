@@ -1,4 +1,4 @@
-import { parseTime, nextAlarm, isDue, formatClock } from './core/alarm.js';
+import { parseTime, nextAlarm, isDue, dueAction, minutesLate, refreshEvery, formatClock } from './core/alarm.js';
 import { rowsOf, section, text, number } from './core/brief.js';
 import { buildScript } from './core/speech.js';
 import { applyVote, voteFor } from './core/votes.js';
@@ -35,10 +35,13 @@ const store = {
 
 let rows = [];
 let alarmAt = store.get('alarmAt', null);
-let pendingAlarmAt = null;
 let ringing = false;
+// When the chime check closes itself if nobody answers it.
+let confirmUntil = null;
 let wakeLock = null;
 let lastMinute = -1;
+
+const CONFIRM_MS = 2 * 60_000;
 
 function log(event, bad = false) {
   const entries = store.get('log', []);
@@ -99,39 +102,53 @@ async function holdWakeLock() {
   }
 }
 
-async function beginArming(at) {
-  pendingAlarmAt = at;
-  const state = await startEngine((event) => log(event, event !== 'audio running'));
-  if (state !== 'running') log(`audio ${state} at arm`, true);
-  chime();
-  holdWakeLock();
-  $('no-sound-help').hidden = true;
-  $('confirm').hidden = false;
+function startAudio() {
+  return startEngine((event) => log(event, event !== 'audio running'));
 }
 
-function finishArming() {
-  alarmAt = pendingAlarmAt;
-  pendingAlarmAt = null;
-  store.set('alarmAt', alarmAt);
-  log(`armed for ${clockLabel(new Date(alarmAt))}`);
+function closeConfirm() {
   $('confirm').hidden = true;
+  confirmUntil = null;
+}
+
+// The alarm is stored at the tap, so falling asleep on the chime check still leaves it set.
+// The chime check only reports whether the owner heard the speaker.
+async function arm(at) {
+  if (isDue(Date.now(), at)) return;
+  alarmAt = at;
+  store.set('alarmAt', at);
+  log(`armed for ${clockLabel(new Date(at))}`);
   $('controls').hidden = true;
   drawAlarmStatus();
+  $('no-sound-help').hidden = true;
+  $('confirm').hidden = false;
+  confirmUntil = Date.now() + CONFIRM_MS;
+  holdWakeLock();
+  const state = await startAudio();
+  if (state !== 'running') log(`audio ${state} at arm`, true);
+  chime();
 }
 
-function disarm(reason) {
+function disarm(reason, bad = false) {
   alarmAt = null;
   store.set('alarmAt', null);
-  log(reason);
+  log(reason, bad);
   drawAlarmStatus();
 }
 
-async function ring() {
+async function ring(late) {
   ringing = true;
+  closeConfirm();
+  $('rearm').hidden = true;
   $('ring-time').textContent = clockLabel(new Date());
   $('ring').hidden = false;
   show('clock');
+  if (late > 0) log(`alarm rang ${late} minutes late`, true);
+  // Not awaited: the tone must not wait on the network, and the stop tap reads whatever has arrived.
+  loadBrief();
+  if (engineState() === 'none') { log('alarm time reached with no audio engine', true); return; }
   const state = await startRing();
+  if (state === 'stopped') return;
   log(state === 'running' ? 'alarm tone started' : `alarm tone not playing, audio ${state}`, state !== 'running');
 }
 
@@ -155,6 +172,7 @@ function stopAlarmAndGreet() {
   stopRing();
   ringing = false;
   $('ring').hidden = true;
+  closeConfirm();
   disarm('alarm stopped by tap');
   drawBrief();
   show('brief');
@@ -265,17 +283,30 @@ function drawLog() {
 
 function tick() {
   const now = new Date();
+  const ms = now.getTime();
   if (now.getMinutes() !== lastMinute) {
     lastMinute = now.getMinutes();
     drawClock(now);
   }
-  if (alarmAt !== null && !ringing && $('rearm').hidden && isDue(now.getTime(), alarmAt)) ring();
-  if (alarmAt !== null && !ringing && now.getTime() - lastLoad >= REFRESH_MS) loadBrief();
+  if (confirmUntil !== null && ms >= confirmUntil) {
+    closeConfirm();
+    log('chime not confirmed', true);
+  }
+  if (alarmAt === null || ringing) return;
+  const action = dueAction(ms, alarmAt);
+  if (action === 'missed') {
+    disarm(`alarm missed: page resumed ${minutesLate(ms, alarmAt)} minutes late`, true);
+  } else if (action === 'ring') {
+    ring(minutesLate(ms, alarmAt));
+  } else if (ms - lastLoad >= refreshEvery(ms, alarmAt)) {
+    loadBrief();
+  }
 }
 
-const REFRESH_MS = 10 * 60_000;
 let briefNotice = '';
 let lastLoad = 0;
+// Only the newest request may replace the rows, so a slow older one cannot overwrite a fresh brief.
+let loadSeq = 0;
 // Logged only when the outcome changes, so a night of refreshes does not fill the log.
 let loadFailed = null;
 
@@ -296,11 +327,16 @@ async function fetchRows() {
 // A failed refresh keeps the rows already on screen; the stale check stops an old brief being read as new.
 async function loadBrief() {
   lastLoad = Date.now();
+  loadSeq += 1;
+  const mine = loadSeq;
   try {
-    rows = await fetchRows();
+    const fetched = await fetchRows();
+    if (mine !== loadSeq) return briefNotice;
+    rows = fetched;
     if (loadFailed !== false) log('brief loaded');
     loadFailed = false;
   } catch (err) {
+    if (mine !== loadSeq) return briefNotice;
     briefNotice = `The brief did not load: ${err.message}.`;
     if (loadFailed !== true) log(`brief failed to load: ${err.message}`, true);
     loadFailed = true;
@@ -315,20 +351,30 @@ $('alarm-time').value = store.get('time', '06:30');
 $('alarm-time').addEventListener('change', () => store.set('time', $('alarm-time').value));
 $('arm').addEventListener('click', () => {
   const time = parseTime($('alarm-time').value);
-  if (time) beginArming(nextAlarm(new Date(), time).getTime());
+  if (time) arm(nextAlarm(new Date(), time).getTime());
 });
-$('test').addEventListener('click', () => beginArming(Date.now() + 60_000));
+$('test').addEventListener('click', () => arm(Date.now() + 60_000));
 $('disarm').addEventListener('click', () => disarm('alarm turned off'));
-$('heard').addEventListener('click', finishArming);
+$('heard').addEventListener('click', () => {
+  closeConfirm();
+  log('chime confirmed');
+});
 $('replay').addEventListener('click', () => chime());
 $('not-heard').addEventListener('click', () => {
   log('chime not heard at arm', true);
   $('no-sound-help').hidden = false;
 });
+$('confirm-off').addEventListener('click', () => {
+  closeConfirm();
+  disarm('alarm turned off at the chime check');
+});
 $('ring').addEventListener('click', stopAlarmAndGreet);
+// A time already past is never stored again; the tick rings it, now with the engine this tap starts.
 $('rearm').addEventListener('click', () => {
   $('rearm').hidden = true;
-  beginArming(alarmAt);
+  if (alarmAt === null) return;
+  if (isDue(Date.now(), alarmAt)) startAudio();
+  else arm(alarmAt);
 });
 $('dim').addEventListener('click', () => {
   const level = (store.get('dim', 2) % 3) + 1;
@@ -381,8 +427,7 @@ document.body.className = `dim-${store.get('dim', 2)}`;
 // A reloaded page has no audio engine, and only a tap can start one.
 if (alarmAt !== null) {
   if (isDue(Date.now(), alarmAt)) {
-    disarm(`page reloaded after the alarm time ${clockLabel(new Date(alarmAt))}; alarm missed`);
-    store.set('log', store.get('log', []).map((e, i, all) => (i === all.length - 1 ? { ...e, bad: true } : e)));
+    disarm(`page reloaded after the alarm time ${clockLabel(new Date(alarmAt))}; alarm missed`, true);
   } else {
     log('page reloaded while armed', true);
     $('rearm-detail').textContent = `The page restarted. The alarm for ${clockLabel(new Date(alarmAt))} needs a tap to work.`;
