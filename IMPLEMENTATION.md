@@ -188,11 +188,21 @@ Known limits:
 - Fetching from the mocked API was checked in headless Chromium on 2026-11-17.
   It is untested against GitHub and on the iPad.
 
+## The daily brief task
+
+A scheduled Claude task named "Nightstand Brief morning brief" runs every day at
+5:17 AM Mountain time in a fresh cloud session with the Gmail and Google
+Calendar connectors. It follows [`generator/TASK.md`](generator/TASK.md) and
+writes `brief.json` to the private repository. The owner approved it on
+2026-11-17, including its daily usage cost.
+
+The owner's older 7:30 AM dashboard brief is a separate task and is unchanged.
+
+Votes do not reach the task yet, so news picks use only the interests in
+MISSION.md.
+
 ## Open
 
-- **Moving the Morning brief task.** It runs at 7:30 AM on weekdays. It has to
-  finish before a 6:00 AM alarm, write `brief.json` to the private repository
-  with a `date`, and add the news section. Weekend behaviour is undecided.
 - **Live weather on the clock.** The clock shows the forecast from the last
   brief. A direct call to the National Weather Service API would keep the
   current temperature fresh overnight.
