@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nightstand">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css">
+<title>Nightstand</title>
+</head>
+<body class="dim-2">
+
+<main id="clock" class="view">
+  <div id="face">
+    <div id="time-row"><span id="time">--:--</span><span id="suffix"></span></div>
+    <p id="date"></p>
+    <p id="weather"></p>
+    <p id="alarm-status"></p>
+  </div>
+
+  <section id="controls" hidden>
+    <label class="field">Alarm time <input id="alarm-time" type="time" value="06:30"></label>
+    <div class="buttons">
+      <button id="arm" type="button">Arm alarm</button>
+      <button id="disarm" type="button" hidden>Turn alarm off</button>
+      <button id="test" type="button">Test in 1 minute</button>
+      <button id="dim" type="button">Brightness</button>
+      <button id="open-brief" type="button">Open brief</button>
+      <button id="open-log" type="button">Night log</button>
+    </div>
+    <p class="hint">Tap the clock to hide these.</p>
+  </section>
+</main>
+
+<div id="confirm" class="overlay" hidden>
+  <h2>Did you hear the chime?</h2>
+  <p>The alarm uses the same speaker and volume.</p>
+  <div class="buttons">
+    <button id="heard" type="button">I heard it</button>
+    <button id="replay" type="button">Play it again</button>
+    <button id="not-heard" type="button">No sound</button>
+  </div>
+  <p id="no-sound-help" class="hint" hidden>Turn the volume up with the side buttons, check that Silent mode is off in Control Centre, then tap Play it again.</p>
+</div>
+
+<button id="rearm" class="overlay big-tap" type="button" hidden>
+  <span class="big">Tap to re-arm</span>
+  <span id="rearm-detail"></span>
+</button>
+
+<button id="ring" class="overlay big-tap ringing" type="button" hidden>
+  <span class="big">Tap to stop</span>
+  <span id="ring-time"></span>
+</button>
+
+<main id="brief" class="view" hidden>
+  <header class="bar">
+    <button id="back" type="button">Clock</button>
+    <button id="read" type="button">Read aloud</button>
+    <button id="hush" type="button" hidden>Stop reading</button>
+  </header>
+  <p id="now-reading" aria-live="polite"></p>
+  <div id="brief-body"></div>
+</main>
+
+<main id="log" class="view" hidden>
+  <header class="bar">
+    <button id="log-back" type="button">Clock</button>
+    <button id="log-clear" type="button">Start a new log</button>
+  </header>
+  <ol id="log-list"></ol>
+</main>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
