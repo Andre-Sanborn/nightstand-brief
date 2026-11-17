@@ -8,7 +8,8 @@
 - [x] Add thumbs up, thumbs down and "nothing like this" on news items, stored on the device
 - [x] Add the workflow that publishes `app/` with GitHub Pages from `main`
 - [x] Owner: make the repository public and turn on GitHub Pages
-- [ ] Merge the development branch to `main` and confirm the page loads
+- [x] Merge the development branch to `main` and publish the page
+- [ ] Owner: open the page on the iPad and add it to the Home Screen
 - [ ] Device test 1: one-minute alarm on the iPad, tone and speech both heard
 - [ ] Device test 2: arm overnight, read the night log in the morning
 
@@ -20,7 +21,9 @@
 - [ ] Owner: create a read-only token and type it into the iPad
 - [x] Write the brief generator contract and a checker for `brief.json`
 - [x] Write the instructions the daily brief task follows, including the checker step
-- [ ] Create the daily brief task and confirm one run writes a valid `brief.json`
+- [x] Create the daily brief task
+- [ ] Owner: add the Gmail and Google Calendar connectors to the daily brief task
+- [ ] Confirm one scheduled run writes a valid `brief.json`
 - [ ] Send votes back so the next brief's news picks use them
 - [ ] Ask the owner follow-up questions to narrow each news topic
 

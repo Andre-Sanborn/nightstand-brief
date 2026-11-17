@@ -187,12 +187,17 @@ Known limits:
   "GitHub answered 401" until a new one is typed in.
 - Fetching from the mocked API was checked in headless Chromium on 2026-11-17.
   It is untested against GitHub and on the iPad.
+- The first publish from `main` succeeded on 2026-11-17 according to the
+  workflow run. The build container cannot reach the published site, so the
+  page loading is confirmed on the iPad.
 
 ## The daily brief task
 
 A scheduled Claude task named "Nightstand Brief morning brief" runs every day at
-5:17 AM Mountain time in a fresh cloud session with the Gmail and Google
-Calendar connectors. It follows [`generator/TASK.md`](generator/TASK.md) and
+5:17 AM Mountain time in a fresh cloud session. It needs the Gmail and Google
+Calendar connectors. A task created from inside a session cannot carry them, so
+the owner adds them to the task on the claude.ai routines page. Without them a
+run writes weather and news only and says so in the headline. It follows [`generator/TASK.md`](generator/TASK.md) and
 writes `brief.json` to the private repository. The owner approved it on
 2026-11-17, including its daily usage cost.
 
