@@ -194,7 +194,9 @@ Known limits:
 ## The daily brief task
 
 A scheduled Claude task named "Nightstand Brief morning brief" runs every day at
-5:17 AM Mountain time in a fresh cloud session. It needs the Gmail and Google
+5:17 AM Mountain time in a fresh cloud session, in the cloud environment named
+`nightstand-brief`. That environment allows `api.weather.gov`, which the
+owner's Default environment blocks. It needs the Gmail and Google
 Calendar connectors. A task created from inside a session cannot carry them, so
 the owner adds them to the task on the claude.ai routines page. Without them a
 run writes weather and news only and says so in the headline. It follows [`generator/TASK.md`](generator/TASK.md) and
@@ -202,6 +204,10 @@ writes `brief.json` to the private repository. The owner approved it on
 2026-11-17, including its daily usage cost.
 
 The owner's older 7:30 AM dashboard brief is a separate task and is unchanged.
+
+A trial run by hand on 2026-11-17 took about six minutes and wrote a brief that
+passed the checker, with mail, calendar, AI notes and three news items. Its news
+sources were checked against search summaries, not fetched articles.
 
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.

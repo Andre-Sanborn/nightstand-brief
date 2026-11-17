@@ -25,32 +25,45 @@ report in a few lines.
    `meta.date`.
 2. Read the previous `brief.json` from the private repository, if there is one.
    Use it only to avoid repeating a news story and to keep a recurring story's
-   `id` the same.
+   `id` the same. Where a step says "since the previous brief" and there is
+   none, use the last 48 hours.
 3. Gather, in parallel where possible:
    - **Calendar**: events from today through three days ahead. Today's rows have
      a `day` beginning with the word "Today". If today is empty, write one row
      titled "Nothing scheduled".
    - **Email**: the last two days, or since the previous brief. Keep only
-     messages from a real person that need a reply, and messages with a deadline
-     or an account-security consequence. Skip marketing, receipts, newsletters
+     messages from a real person that need a reply, messages with a deadline,
+     and security alerts that ask for action or say to check whether it was you.
+     A security notice that only confirms something the reader did is skipped. Skip marketing, receipts, newsletters
      and automated notices with nothing to act on. At most five `email` rows.
    - **To-dos**: at most five things that need action today or within three
      days, drawn from the calendar and the email above. Most urgent first. The
      `tag` says when: "Today", "Tomorrow", a weekday, or "Overdue".
-   - **Weather**: the National Weather Service forecast for Boise, Idaho, seven
-     days, in Fahrenheit. Row 0 is today. Add one `wx_note` sentence on what
-     matters this week. If the forecast cannot be fetched, write no `wx` rows and
-     say so in the report; never invent a forecast.
+   - **Weather**: the National Weather Service forecast for Boise, Idaho, in
+     Fahrenheit, from `https://api.weather.gov/gridpoints/BOI/133,86/forecast`.
+     Send a `User-Agent` header of `nightstand-brief` and nothing personal. Pair
+     each day period with the night after it: `hi` from the day, `lo` from the
+     night, `title` from the day's short forecast, `pop` the larger of the two
+     chances of precipitation. Row 0 is today, up to seven rows. Add one
+     `wx_note` sentence on what matters this week. If the forecast cannot be
+     fetched, write no `wx` rows and no `wx_note`, and say so in the report.
+     Never invent a forecast and never use another source.
    - **AI notes**: first-party release notes from Anthropic's Claude Code
      changelog and Claude platform release notes that are new since the previous
      brief. At most three `ai` rows. None is a normal result.
    - **News**: three stories, picked as the contract's "Picking the three news items"
      section says, from the interests in [MISSION.md](../MISSION.md). Published
      or materially updated in the last 24 hours. Check each against a second
-     source before using it. Name the publisher in `source`.
+     source before using it. Write `source` as the publisher, then
+     "confirmed by" and the second source. Set `topic` to one of these exactly:
+     "AI and tech", "Markets and the economy", "Outdoors, caving and Idaho",
+     "World and US".
+   - **Times** are written in Mountain time. A deadline the calendar holds in
+     another zone is converted.
 4. Write the `meta` row: `date`, a `day` line such as
-   "Tuesday · March 3 2026", a `time` line such as "Ready 5:20 AM", and a `title`
-   of one sentence naming what matters most today.
+   "Tuesday · March 3 2026", a `time` line giving the actual time of writing,
+   such as "Ready 5:20 AM", and a `title` of one sentence naming what matters
+   most today.
 5. Write everything for the ear, as the contract's "Writing for the ear" section
    says.
 6. Check the file with the command in the contract's checker section, run from
