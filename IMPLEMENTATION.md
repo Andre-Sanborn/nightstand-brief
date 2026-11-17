@@ -224,8 +224,9 @@ against search summaries, not fetched articles. A scheduled firing into the
 orchestrator session is unproven until the first morning.
 
 The weather rows come from `generator/weather.mjs`, which pipes the forecast
-through `forecastRows` in `app/core/forecast.js`. It drops a leading night that
-is ending, pairs each day with the night after it, and on an evening run keeps
+through `forecastRows` in `app/core/forecast.js`. It drops periods that are over, including a
+leading night that is ending, refuses a forecast that does not start today,
+pairs each day with the night after it, and on an evening run keeps
 tonight as today with a low and no high. The agent copies the rows and does not
 compute them.
 

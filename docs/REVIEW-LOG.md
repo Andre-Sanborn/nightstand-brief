@@ -1,8 +1,20 @@
 # Review log
 
-Last reviewed commit: 1a2302d
+Last reviewed commit: 9f90189
 
 Newest entry first.
+
+## 2026-11-17, two-hour project check, commit 9f90189
+
+Reviewer: strategy-adversary. Verdict: sound for the next morning's run.
+
+| Finding | Decision |
+|---|---|
+| A forecast served late would give weather for the wrong day and pass every check. | Fixed. Periods that are over are dropped, and the script refuses a forecast that does not start today. |
+| The pinned commit was fetched by branch depth, which stops working after enough later commits. | Fixed. The run fetches the commit by its id. |
+| The real feed matched the script's assumptions, and its rows matched the feed by hand. | Recorded. |
+| Three wrong implementations passed the forecast tests. | Fixed with tests for a late feed, a feed with nothing for today, and a night with no stated chance of rain. |
+| The agent copies the rows by hand. | Left. Low risk for seven short rows; the checker catches a malformed row. |
 
 ## 2026-11-17, two-hour project check, commits 6747c66 to 1a2302d
 

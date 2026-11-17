@@ -1,6 +1,6 @@
 // Reads a National Weather Service forecast on standard input and prints today's wx rows as JSON.
 // The fetch is left to curl, which honours the cloud environment's proxy.
-import { forecastRows } from '../app/core/forecast.js';
+import { forecastRows, startsToday } from '../app/core/forecast.js';
 
 let input = '';
 for await (const chunk of process.stdin) input += chunk;
@@ -15,9 +15,9 @@ try {
 
 const now = new Date();
 const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
-const rows = forecastRows(periods, today);
-if (!rows.length) {
-  console.error('The forecast held no periods.');
+if (!startsToday(periods, today)) {
+  console.error(`The forecast does not start on ${today}; it may be an old issue.`);
   process.exit(1);
 }
+const rows = forecastRows(periods, today);
 console.log(JSON.stringify(rows, null, 1));

@@ -16,12 +16,23 @@ function chance(period) {
   return Number.isFinite(value) ? value : 0;
 }
 
+// Drops periods that are over: any that ended before today, and a leading night that
+// ends this morning. A feed served late then starts on the right day or yields nothing for it.
+export function currentPeriods(periods, today) {
+  const list = (Array.isArray(periods) ? periods : []).filter((p) => dateOf(p.endTime) >= today);
+  if (list.length && !list[0].isDaytime && dateOf(list[0].endTime) === today) list.shift();
+  return list;
+}
+
+export function startsToday(periods, today) {
+  const list = currentPeriods(periods, today);
+  return list.length > 0 && dateOf(list[0].startTime) === today;
+}
+
 // Turns National Weather Service forecast periods into wx rows, one per calendar day.
 // `today` is the local date as YYYY-MM-DD.
 export function forecastRows(periods, today) {
-  const list = Array.isArray(periods) ? periods.slice() : [];
-  // Before 6 AM the first period is the night that is ending; it belongs to yesterday.
-  if (list.length && !list[0].isDaytime && dateOf(list[0].endTime) === today) list.shift();
+  const list = currentPeriods(periods, today);
 
   const rows = [];
   let i = 0;
