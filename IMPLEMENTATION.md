@@ -196,14 +196,18 @@ Known limits:
 
 A scheduled Claude task named "Nightstand Brief morning brief" fires every day
 at 5:17 AM Mountain time into the orchestrator session. That session launches
-one agent, which follows [`generator/TASK.md`](generator/TASK.md) as it stands
-on `main` and writes `brief.json` to the private repository. The owner approved
+one agent, which follows [`generator/TASK.md`](generator/TASK.md) and writes
+`brief.json` to the private repository. The task's stored prompt names one
+commit of this repository, and the run reads the generator files and the checker
+from that commit. A change to `generator/` reaches the run only when the
+orchestrator moves that pin, so an unreviewed edit never does. The owner approved
 the daily run and its usage cost on 2026-11-17.
 
 The task depends on the orchestrator session. That session holds what the run
 needs: the Gmail and Google Calendar connectors, GitHub write access to the
 private repository, and a cloud environment named `nightstand-brief` that allows
-`api.weather.gov`. If the session is archived, the brief stops and the app says
+`api.weather.gov` (reached with curl from this session on 2026-11-17; Node's own
+fetch does not go through the environment's proxy). If the session is archived, the brief stops and the app says
 it has not arrived.
 
 A task that starts a fresh session each morning does not work when it is created
@@ -218,6 +222,12 @@ no weather, because that session could not then reach the forecast; the weather
 rows were added afterwards by a one-off script. Its news sources were checked
 against search summaries, not fetched articles. A scheduled firing into the
 orchestrator session is unproven until the first morning.
+
+The weather rows come from `generator/weather.mjs`, which pipes the forecast
+through `forecastRows` in `app/core/forecast.js`. It drops a leading night that
+is ending, pairs each day with the night after it, and on an evening run keeps
+tonight as today with a low and no high. The agent copies the rows and does not
+compute them.
 
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.

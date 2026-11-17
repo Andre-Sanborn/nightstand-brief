@@ -36,8 +36,8 @@ docs/REVIEW-LOG.md, update "Last reviewed commit" to the reviewed HEAD, and
 commit and push. Record any changed decision in IMPLEMENTATION.md.
 
 When there are no new commits and no uncommitted decisions, do not launch the
-adversary. Add one line to docs/REVIEW-LOG.md saying the period had no
-decisions, and stop.
+adversary and change no file. Say in one line that the period had no decisions,
+and stop.
 
 ## The scheduled task
 
@@ -48,5 +48,5 @@ fires into the orchestrator session with this prompt:
 > .claude/reviews/project-check.md in /home/user/nightstand-brief and follow it.
 > Launch the review as a strategy-adversary agent on the Opus model, read-only.
 > If there are no new commits since "Last reviewed commit" in docs/REVIEW-LOG.md
-> and no uncommitted decisions, add the one-line entry and stop without
-> launching an agent.
+> and no uncommitted decisions, change no file, say so in one line, and stop
+> without launching an agent.

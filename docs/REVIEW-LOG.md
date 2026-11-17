@@ -1,8 +1,20 @@
 # Review log
 
-Last reviewed commit: 962ffb6
+Last reviewed commit: 1a2302d
 
 Newest entry first.
+
+## 2026-11-17, two-hour project check, commits 6747c66 to 1a2302d
+
+Reviewer: strategy-adversary.
+
+| Finding | Decision |
+|---|---|
+| The next daily run would follow the task instructions on `main`, which could write a forecast half a day off that passes the checker. | Accepted. The run now reads the generator files from a pinned commit, and the weather rows come from a tested script, not from the agent. |
+| Waiting on the owner for a merge was not needed for the daily run. | Accepted. The merge to `main` still needs the owner's word; the run no longer depends on it. |
+| A reclaimed container may have no clone. | Already covered: the task's prompt re-attaches and clones. Unproven until it happens. |
+| The notes said the session holds weather access without saying how that was measured. | Fixed. |
+| The check costs more than it finds while the project waits on the owner. | Put to the owner as a proposal. A period with no changes now changes no file. |
 
 ## 2026-11-17, two-hour project check, commits 6fec1e4 to 962ffb6
 

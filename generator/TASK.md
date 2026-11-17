@@ -39,16 +39,18 @@ report in a few lines.
    - **To-dos**: at most five things that need action today or within three
      days, drawn from the calendar and the email above. Most urgent first. The
      `tag` says when: "Today", "Tomorrow", a weekday, or "Overdue".
-   - **Weather**: the National Weather Service forecast for Boise, Idaho, in
-     Fahrenheit, from `https://api.weather.gov/gridpoints/BOI/133,86/forecast`.
-     Send a `User-Agent` header of `nightstand-brief` and nothing personal. Skip a
-     leading night period: before 6 AM the first period is the night that is
-     ending. Pair each day period with the night after it: `hi` from the day, `lo` from the
-     night, `title` from the day's short forecast, `pop` the larger of the two
-     chances of precipitation. Row 0 is today, up to seven rows. Add one
-     `wx_note` sentence on what matters this week. If the forecast cannot be
-     fetched, write no `wx` rows and no `wx_note`, and say so in the report.
-     Never invent a forecast and never use another source.
+   - **Weather**: the National Weather Service forecast for Boise, Idaho. Run
+     this from the root of a clone of this repository and use the rows it prints
+     unchanged:
+
+     ```bash
+     set -o pipefail; curl -sS -m 30 -H "User-Agent: nightstand-brief" "https://api.weather.gov/gridpoints/BOI/133,86/forecast" | TZ=America/Boise node generator/weather.mjs
+     ```
+
+     Never work the rows out by hand, and never use another source. Add one
+     `wx_note` sentence on what matters this week, drawn only from those rows.
+     If the command fails, write no `wx` rows and no `wx_note`, and say so in the
+     report.
    - **AI notes**: first-party release notes from Anthropic's Claude Code
      changelog and Claude platform release notes that are new since the previous
      brief. At most three `ai` rows. None is a normal result.
