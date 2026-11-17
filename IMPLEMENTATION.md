@@ -194,22 +194,30 @@ Known limits:
 
 ## The daily brief task
 
-A scheduled Claude task named "Nightstand Brief morning brief" runs every day at
-5:17 AM Mountain time in a fresh cloud session, in the cloud environment named
-`nightstand-brief`. That environment allows `api.weather.gov`, which the
-owner's Default environment blocks. It needs the Gmail and Google
-Calendar connectors. A task created from inside a session cannot carry them, so
-the owner adds them to the task on the claude.ai routines page. Without them a
-run writes weather and news only and says so in the headline. It follows [`generator/TASK.md`](generator/TASK.md) and
-writes `brief.json` to the private repository. The owner approved it on
-2026-11-17, including its daily usage cost.
+A scheduled Claude task named "Nightstand Brief morning brief" fires every day
+at 5:17 AM Mountain time into the orchestrator session. That session launches
+one agent, which follows [`generator/TASK.md`](generator/TASK.md) as it stands
+on `main` and writes `brief.json` to the private repository. The owner approved
+the daily run and its usage cost on 2026-11-17.
+
+The task depends on the orchestrator session. That session holds what the run
+needs: the Gmail and Google Calendar connectors, GitHub write access to the
+private repository, and a cloud environment named `nightstand-brief` that allows
+`api.weather.gov`. If the session is archived, the brief stops and the app says
+it has not arrived.
+
+A task that starts a fresh session each morning does not work when it is created
+from inside a session. Measured on 2026-11-17 by firing one: the fresh session
+had no connectors, no tool to attach a repository, and no GitHub credential, and
+wrote nothing. A durable version has to be created by the owner on the claude.ai
+routines page, with both repositories and both connectors attached.
 
 A trial run by hand on 2026-11-17 took about six minutes and wrote a brief that
 passed the checker, with mail, calendar, AI notes and three news items. It had
-no weather, because that session could not reach the forecast; the weather rows
-were added afterwards by a one-off script. Its news sources were checked against
-search summaries, not fetched articles. A run in the scheduled environment is
-unproven.
+no weather, because that session could not then reach the forecast; the weather
+rows were added afterwards by a one-off script. Its news sources were checked
+against search summaries, not fetched articles. A scheduled firing into the
+orchestrator session is unproven until the first morning.
 
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.
