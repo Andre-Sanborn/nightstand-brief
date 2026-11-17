@@ -1,8 +1,24 @@
 # Review log
 
-Last reviewed commit: bf3158c
+Last reviewed commit: 962ffb6
 
 Newest entry first.
+
+## 2026-11-17, two-hour project check, commits 6fec1e4 to 962ffb6
+
+Reviewer: strategy-adversary.
+
+| Finding | Decision |
+|---|---|
+| The scheduled environment has never run the daily brief task. | Accepted. The task was fired once by hand to prove it. |
+| The merge commit on `main` carries the owner's name and personal email. | Accepted. Reported to the owner, who decides whether `main` is rewritten. Later merges are pushed with git under the agent identity, not merged through the GitHub API. |
+| The notes said the page was confirmed on the iPad. | Fixed. It is untested. |
+| The notes overstated the trial run and the browser checks. | Fixed. |
+| The notes said the alarm was set only after the chime check. | Fixed. |
+| A run before 6 AM could build today's weather row from the night that is ending. | Fixed in the task instructions. |
+| Topic names differed between the contract, the sample and the task. | Fixed. One spelling everywhere. |
+| The notes named another of the owner's scheduled tasks. | Removed. |
+| "Merge and publish" was ticked on the workflow run alone. | Kept. The tick covers the merge and the publish run; opening the page is a separate open item. |
 
 ## 2026-11-17, verification of the first build
 

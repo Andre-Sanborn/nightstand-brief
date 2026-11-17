@@ -55,8 +55,9 @@ Late and missed alarms:
 What the page does about each risk:
 
 - **Muted audio.** The page sets the audio session type to `playback` before it
-  creates the audio context. Arming plays a chime and the alarm is only set
-  after the owner taps "I heard it", because a page cannot read the volume.
+  creates the audio context. Arming plays a chime and asks whether the owner heard
+  it, because a page cannot read the volume. The answer is logged; the alarm is
+  set either way.
 - **A stalled audio context.** One inaudible oscillator runs from the Arm tap so
   the context stays in use. Every state change is logged. When the context
   leaves `running` the page tries `resume()`, then `suspend()` and `resume()`.
@@ -94,8 +95,8 @@ when the tone started. The log is how a device test is read the next morning.
   alarm screen shown after an unanswered reload; no ring and a logged miss when
   the clock jumps to 2:00 PM; a second reading after "Stop reading" speaking
   every line once; and load, failure and stale cases against a mocked GitHub.
-  The scripts are not in the repository because they need Playwright, which
-  would be the first dependency. Chromium says nothing about iPadOS audio,
+  The scripts are not in the repository and cannot be re-run from it, because
+  they need Playwright, which would be the first dependency. Chromium says nothing about iPadOS audio,
   speech or wake lock behaviour.
 - Each of twelve deliberate faults in `app/core/` fails `npm test`.
 
@@ -189,7 +190,7 @@ Known limits:
   It is untested against GitHub and on the iPad.
 - The first publish from `main` succeeded on 2026-11-17 according to the
   workflow run. The build container cannot reach the published site, so the
-  page loading is confirmed on the iPad.
+  page loading is untested until the owner opens it on the iPad.
 
 ## The daily brief task
 
@@ -203,11 +204,12 @@ run writes weather and news only and says so in the headline. It follows [`gener
 writes `brief.json` to the private repository. The owner approved it on
 2026-11-17, including its daily usage cost.
 
-The owner's older 7:30 AM dashboard brief is a separate task and is unchanged.
-
 A trial run by hand on 2026-11-17 took about six minutes and wrote a brief that
-passed the checker, with mail, calendar, AI notes and three news items. Its news
-sources were checked against search summaries, not fetched articles.
+passed the checker, with mail, calendar, AI notes and three news items. It had
+no weather, because that session could not reach the forecast; the weather rows
+were added afterwards by a one-off script. Its news sources were checked against
+search summaries, not fetched articles. A run in the scheduled environment is
+unproven.
 
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.

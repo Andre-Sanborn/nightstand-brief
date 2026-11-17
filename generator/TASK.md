@@ -41,8 +41,9 @@ report in a few lines.
      `tag` says when: "Today", "Tomorrow", a weekday, or "Overdue".
    - **Weather**: the National Weather Service forecast for Boise, Idaho, in
      Fahrenheit, from `https://api.weather.gov/gridpoints/BOI/133,86/forecast`.
-     Send a `User-Agent` header of `nightstand-brief` and nothing personal. Pair
-     each day period with the night after it: `hi` from the day, `lo` from the
+     Send a `User-Agent` header of `nightstand-brief` and nothing personal. Skip a
+     leading night period: before 6 AM the first period is the night that is
+     ending. Pair each day period with the night after it: `hi` from the day, `lo` from the
      night, `title` from the day's short forecast, `pop` the larger of the two
      chances of precipitation. Row 0 is today, up to seven rows. Add one
      `wx_note` sentence on what matters this week. If the forecast cannot be

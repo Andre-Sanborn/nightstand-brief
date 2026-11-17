@@ -96,7 +96,7 @@ It also appears on the clock overnight.
 | Field | Required | Use |
 |---|---|---|
 | `id` | Yes | A stable identifier for the story. Votes are stored against it. See below. |
-| `topic` | Yes | The interest it belongs to, such as "Markets & economy". Stored with each vote. |
+| `topic` | Yes | The interest it belongs to, such as "Markets and the economy". Stored with each vote. |
 | `title` | Yes | One sentence, under 140 characters. Read aloud. |
 | `detail` | Yes | One or two sentences. Read aloud straight after the title. |
 | `source` | No | The publisher. Shown. |
@@ -234,14 +234,14 @@ it is made up.
     { "section": "wx", "ord": 0, "day": "Tue", "title": "Partly sunny", "hi": 52, "lo": 34, "pop": 10 },
     { "section": "wx", "ord": 1, "day": "Wed", "title": "Rain", "hi": 47, "lo": 36, "pop": 80 },
     { "section": "wx_note", "ord": 0, "detail": "Dry today, then rain moves in Wednesday morning.", "source": "Sample forecast" },
-    { "section": "news", "ord": 0, "id": "sample-lab-releases-model", "topic": "AI & tech",
+    { "section": "news", "ord": 0, "id": "sample-lab-releases-model", "topic": "AI and tech",
       "title": "A sample lab released a smaller language model that runs on phones.",
       "detail": "It is free to download. The lab says it answers about as well as last year's largest model.",
       "source": "Sample Lab", "link": "https://example.com/sample-model" },
-    { "section": "news", "ord": 1, "id": "sample-bank-holds-rates", "topic": "Markets & economy",
+    { "section": "news", "ord": 1, "id": "sample-bank-holds-rates", "topic": "Markets and the economy",
       "title": "A sample central bank held its interest rate steady.",
       "detail": "It said it will look at the rate again in six weeks.", "source": "Sample Bank" },
-    { "section": "news", "ord": 2, "id": "sample-cave-mapped", "topic": "Outdoors, caving & Idaho",
+    { "section": "news", "ord": 2, "id": "sample-cave-mapped", "topic": "Outdoors, caving and Idaho",
       "title": "Volunteers finished mapping a sample cave.",
       "detail": "The map adds two miles of passage and will be published this spring.", "source": "Sample Grotto" },
     { "section": "email", "ord": 0, "title": "A neighbor asked to borrow the ladder", "detail": "They need it Saturday." },

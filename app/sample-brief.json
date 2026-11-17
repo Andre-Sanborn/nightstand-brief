@@ -11,9 +11,9 @@
     { "section": "wx", "ord": 2, "day": "Thu", "title": "Showers", "hi": 45, "lo": 33, "pop": 60 },
     { "section": "wx", "ord": 3, "day": "Fri", "title": "Mostly cloudy", "hi": 48, "lo": 31, "pop": 20 },
     { "section": "wx_note", "ord": 0, "detail": "Dry today, then rain moves in Wednesday morning and lingers through Thursday.", "source": "Sample forecast" },
-    { "section": "news", "ord": 0, "id": "sample-chip-plant", "topic": "AI & tech", "title": "A sample chip maker opens a new plant", "detail": "This is an invented story that stands in for the first news item.", "source": "Sample Wire" },
-    { "section": "news", "ord": 1, "id": "sample-rate-hold", "topic": "Markets & economy", "title": "A sample central bank holds rates steady", "detail": "This is an invented story that stands in for the second news item.", "source": "Sample Wire" },
-    { "section": "news", "ord": 2, "id": "sample-cave-survey", "topic": "Outdoors, caving & Idaho", "title": "Volunteers finish a sample cave survey", "detail": "This is an invented story that stands in for the third news item.", "source": "Sample Wire" },
+    { "section": "news", "ord": 0, "id": "sample-chip-plant", "topic": "AI and tech", "title": "A sample chip maker opens a new plant", "detail": "This is an invented story that stands in for the first news item.", "source": "Sample Wire" },
+    { "section": "news", "ord": 1, "id": "sample-rate-hold", "topic": "Markets and the economy", "title": "A sample central bank holds rates steady", "detail": "This is an invented story that stands in for the second news item.", "source": "Sample Wire" },
+    { "section": "news", "ord": 2, "id": "sample-cave-survey", "topic": "Outdoors, caving and Idaho", "title": "Volunteers finish a sample cave survey", "detail": "This is an invented story that stands in for the third news item.", "source": "Sample Wire" },
     { "section": "ai", "ord": 0, "tag": "New", "title": "A sample release note", "detail": "An invented product update, shown on screen only." },
     { "section": "email", "ord": 0, "title": "Jordan asked about the packing list", "detail": "An invented message, shown on screen only." },
     { "section": "tip", "ord": 0, "tag": "iPad", "title": "Swipe down from the top right", "detail": "Opens Control Centre, where the brightness slider is." }

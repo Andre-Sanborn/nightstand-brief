@@ -141,6 +141,10 @@ git push -u origin claude/wonderful-feynman-7eq6yb
 
 - **`main` and pull requests need the human's word each time.** The app is
   published from `main`, so a merge there changes what the iPad runs.
+- **Never merge through the GitHub API or website.** GitHub writes that merge
+  commit under the human's own name and email, in public. Bring `main` up to
+  date with a fast-forward `git push origin <branch>:main` from this clone, so
+  every commit carries the agent identity.
 - **Stage files by name.** Never `git commit -a` while a delegated agent is
   editing the tree.
 - Commit only work that has been verified and accepted.
