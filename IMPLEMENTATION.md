@@ -37,6 +37,43 @@ Late and missed alarms:
   the alarm time, with no tone, and logs it.
 - A time already past is never stored as an alarm.
 
+## Soft wake
+
+The owner asked for this on 2026-11-17: gentle chimes and a screen that
+brightens slowly over a few minutes.
+
+- A setting of Off, 3, 5 or 10 minutes, default 5, adds a soft wake that ends at
+  the alarm time.
+- Arming stores the alarm time, the arming time and the length, so a reloaded
+  page keeps the same window. Arming inside the window shortens it, so the light
+  still starts from black.
+- A full-screen light changes once a second from black through deep red, amber
+  and warm white to white. Progress is squared, so the first third stays very
+  dark.
+- Soft sine chimes from a pentatonic scale play one at a time, 3 to 5 seconds
+  apart, from very quiet to moderate. They are synthesised, so no audio file is
+  shipped.
+- A tap on the light opens the brief and starts the greeting. It leaves the
+  alarm armed. On a reloaded page that tap also starts the audio engine.
+- At the alarm time after a tap: if the page is still reading aloud, or was
+  touched in the last two minutes, the alarm is skipped and logged. Otherwise it
+  rings, because the owner tapped and fell asleep again.
+- With no tap, the alarm tone starts at the alarm time and the light is hidden.
+- Starting the soft wake closes the chime check and the re-arm screen, and
+  starts a brief fetch.
+- "Test in 1 minute" runs 30 seconds of soft wake, then the alarm.
+
+A web page cannot raise the iPad's backlight, so the white is as bright as the
+iPad's own brightness setting. The in-app brightness levels change the clock's
+colours only.
+
+Checked in headless Chromium on 2026-11-17: the light's timing and colours, one
+chime at a time and none after a stop, tap then doze rings, tap then touch
+skips, arming inside the window, a reloaded page, and soft wake off. Untested on
+the iPad: whether chimes play from an audio context idle all night, how the
+colours look on the panel, and whether the tap on a reloaded page can start
+audio and speech together.
+
 ## iPad behaviour the design depends on
 
 | Claim | Status |

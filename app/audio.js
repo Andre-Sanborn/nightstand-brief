@@ -1,12 +1,20 @@
+import { CHIME_HZ, nextNote, chimeGapMs } from './core/softwake.js';
+
 let ctx = null;
 let ringTimer = null;
 let ringStartedAt = 0;
 let recovering = false;
 let ringGeneration = 0;
+let chimeTimer = null;
+let chimeGeneration = 0;
+let chimeVoice = null;
+let lastChime = -1;
 let report = () => {};
 
 const RAMP_SECONDS = 30;
 const SETTLE_MS = 3000;
+const CHIME_ATTACK = 0.15;
+const CHIME_DECAY = 3.5;
 
 export function engineState() {
   return ctx ? ctx.state : 'none';
@@ -64,17 +72,18 @@ async function recover() {
   }
 }
 
-function note(freq, at, length, level) {
+function note(freq, at, length, level, attack = 0.02, type = 'triangle') {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = 'triangle';
+  osc.type = type;
   osc.frequency.value = freq;
   gain.gain.setValueAtTime(0, at);
-  gain.gain.linearRampToValueAtTime(level, at + 0.02);
+  gain.gain.linearRampToValueAtTime(level, at + attack);
   gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
   osc.connect(gain).connect(ctx.destination);
   osc.start(at);
   osc.stop(at + length + 0.05);
+  return { osc, gain };
 }
 
 export function chime() {
@@ -106,7 +115,44 @@ export async function startRing() {
 }
 
 export function stopRing() {
+  stopChimes();
   ringGeneration += 1;
   if (ringTimer) clearInterval(ringTimer);
   ringTimer = null;
+}
+
+// One note per timer step, never a batch ahead, so a stop leaves nothing queued to sound later.
+// levelNow() gives the gain for the note about to play.
+export function startChimes(levelNow) {
+  if (!ctx) return 'none';
+  stopChimes();
+  const mine = chimeGeneration;
+  const step = () => {
+    if (mine !== chimeGeneration) return;
+    if (ctx.state === 'running') {
+      lastChime = nextNote(lastChime, Math.random());
+      chimeVoice = note(CHIME_HZ[lastChime], ctx.currentTime + 0.05, CHIME_DECAY, levelNow(), CHIME_ATTACK, 'sine');
+    } else {
+      recover();
+    }
+    chimeTimer = setTimeout(step, chimeGapMs(Math.random()));
+  };
+  step();
+  return ctx.state;
+}
+
+// Fades the note still decaying, so the tail does not sound under the greeting.
+export function stopChimes() {
+  chimeGeneration += 1;
+  if (chimeTimer) clearTimeout(chimeTimer);
+  chimeTimer = null;
+  if (chimeVoice && ctx) {
+    const t = ctx.currentTime;
+    const { osc, gain } = chimeVoice;
+    gain.gain.cancelScheduledValues(t);
+    gain.gain.setValueAtTime(gain.gain.value, t);
+    gain.gain.linearRampToValueAtTime(0, t + 0.1);
+    try { osc.stop(t + 0.12); } catch { /* already stopped */ }
+  }
+  chimeVoice = null;
 }

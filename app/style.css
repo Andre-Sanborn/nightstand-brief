@@ -36,7 +36,7 @@ body {
 
 #controls { width: min(100%, 560px); border: 1px solid var(--muted); border-radius: 16px; padding: 16px; }
 .field { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 20px; margin-bottom: 16px; }
-input[type="time"] {
+input[type="time"], select {
   font: inherit; font-size: 24px; color: var(--fg); background: #000;
   border: 1px solid var(--muted); border-radius: 10px; padding: 8px 12px; min-height: 48px;
 }
@@ -66,6 +66,14 @@ button:active { background: var(--muted); }
 }
 .ringing .big, .ringing span { color: inherit; }
 @media (prefers-reduced-motion: reduce) { .ringing { animation: none; background: #d01818; color: #000; } }
+/* Above every other overlay, so a tap in the soft wake never reaches the re-arm button. */
+#light {
+  z-index: 20; justify-content: flex-end;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  transition: background-color 1s linear, color 1s linear;
+}
+#light-text { font-size: 22px; }
+@media (prefers-reduced-motion: reduce) { #light { transition: none; } }
 
 #brief, #log {
   overflow-y: auto; -webkit-overflow-scrolling: touch; color: var(--read);

@@ -10,8 +10,10 @@
 - [x] Owner: make the repository public and turn on GitHub Pages
 - [x] Merge the development branch to `main` and publish the page
 - [ ] Owner: open the page on the iPad and add it to the Home Screen
-- [ ] Device test 1: one-minute alarm on the iPad, tone and speech both heard
+- [x] Add the soft wake: chimes and a brightening screen before the alarm
+- [ ] Device test 1: one-minute alarm on the iPad, soft wake, tone and speech all work
 - [ ] Device test 2: arm overnight, read the night log in the morning
+- [ ] Device test 3: tap during the soft wake, then lie still; the alarm should ring
 
 ## Real brief
 

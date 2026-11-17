@@ -25,6 +25,14 @@
 
   <section id="controls" hidden>
     <label class="field">Alarm time <input id="alarm-time" type="time" value="06:30"></label>
+    <label class="field">Soft wake
+      <select id="soft-wake">
+        <option value="0">Off</option>
+        <option value="3">3 minutes</option>
+        <option value="5" selected>5 minutes</option>
+        <option value="10">10 minutes</option>
+      </select>
+    </label>
     <div class="buttons">
       <button id="arm" type="button">Arm alarm</button>
       <button id="disarm" type="button" hidden>Turn alarm off</button>
@@ -71,6 +79,10 @@
 <button id="ring" class="overlay big-tap ringing" type="button" hidden>
   <span class="big">Tap to stop</span>
   <span id="ring-time"></span>
+</button>
+
+<button id="light" class="overlay" type="button" hidden>
+  <span id="light-text">Tap to hear your brief</span>
 </button>
 
 <main id="brief" class="view" hidden>

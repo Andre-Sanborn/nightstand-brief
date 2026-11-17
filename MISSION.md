@@ -7,12 +7,15 @@ wakes its owner and reads them the morning brief.
 
 1. **Night.** The iPad sits plugged in. The screen shows the time and the weather
    in dim red on black, like an iPhone in StandBy.
-2. **Alarm.** At the set time an alarm tone plays.
-3. **Greeting.** A tap stops the tone. The app says good morning and reads the
+2. **Soft wake.** A few minutes before the alarm, gentle chimes begin and the
+   screen brightens slowly from black to white.
+3. **Alarm.** At the set time an alarm tone plays, unless the owner is already
+   up.
+4. **Greeting.** A tap stops the sound. The app says good morning and reads the
    highlights: the headline, today's to-dos and calendar, the weather, and the
    top three news items.
-4. **Details.** The full brief is on screen to scroll through.
-5. **Feedback.** Each news item takes a thumbs up, a thumbs down, or "nothing
+5. **Details.** The full brief is on screen to scroll through.
+6. **Feedback.** Each news item takes a thumbs up, a thumbs down, or "nothing
    like this". The votes shape the next day's news picks.
 
 ## Where the brief comes from

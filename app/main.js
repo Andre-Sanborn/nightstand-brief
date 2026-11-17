@@ -1,9 +1,10 @@
-import { parseTime, nextAlarm, isDue, dueAction, minutesLate, refreshEvery, formatClock } from './core/alarm.js';
+import { parseTime, nextAlarm, isDue, minutesLate, refreshEvery, formatClock } from './core/alarm.js';
 import { rowsOf, section, text, number } from './core/brief.js';
 import { buildScript } from './core/speech.js';
 import { applyVote, voteFor } from './core/votes.js';
 import { parseSource, briefRequest, isStale } from './core/source.js';
-import { startEngine, engineState, chime, startRing, stopRing } from './audio.js';
+import { softWakeMinutes, softStart, wakePhase, softProgress, dawnRgb, dawnColour, inkFor, chimeGain, ownerUp } from './core/softwake.js';
+import { startEngine, engineState, chime, startRing, stopRing, startChimes, stopChimes } from './audio.js';
 import { speak, stopSpeaking } from './speak.js';
 
 const $ = (id) => document.getElementById(id);
@@ -35,6 +36,13 @@ const store = {
 
 let rows = [];
 let alarmAt = store.get('alarmAt', null);
+// Kept with the alarm so a reloaded page runs the soft wake it was armed with.
+let armedAt = store.get('armedAt', null);
+let softMs = store.get('softMs', 0) || 0;
+let softBegun = false;
+let softTapAt = store.get('softTapAt', null);
+let lastTouch = null;
+let reading = false;
 let ringing = false;
 // When the chime check closes itself if nobody answers it.
 let confirmUntil = null;
@@ -42,6 +50,8 @@ let wakeLock = null;
 let lastMinute = -1;
 
 const CONFIRM_MS = 2 * 60_000;
+const MINUTE = 60_000;
+const TEST_SOFT_MS = 30_000;
 
 function log(event, bad = false) {
   const entries = store.get('log', []);
@@ -77,9 +87,19 @@ function drawWeather() {
   $('weather').textContent = [temps, text(today.title)].filter(Boolean).join('  ·  ');
 }
 
+function softStartAt() {
+  return softStart(alarmAt, armedAt, softMs);
+}
+
 function drawAlarmStatus() {
   const armed = alarmAt !== null;
-  $('alarm-status').textContent = armed ? `Alarm ${clockLabel(new Date(alarmAt))}` : 'Alarm off';
+  let status = 'Alarm off';
+  if (armed) {
+    const start = softStartAt();
+    status = `Alarm ${clockLabel(new Date(alarmAt))}`;
+    if (start < alarmAt) status += ` · soft wake ${clockLabel(new Date(start))}`;
+  }
+  $('alarm-status').textContent = status;
   $('arm').hidden = armed;
   $('test').hidden = armed;
   $('disarm').hidden = !armed;
@@ -113,11 +133,19 @@ function closeConfirm() {
 
 // The alarm is stored at the tap, so falling asleep on the chime check still leaves it set.
 // The chime check only reports whether the owner heard the speaker.
-async function arm(at) {
+async function arm(at, length = softWakeMinutes(store.get('soft', null)) * MINUTE, armed = Date.now()) {
   if (isDue(Date.now(), at)) return;
+  endSoftWake();
+  softBegun = false;
+  softTapAt = null;
+  store.set('softTapAt', null);
   alarmAt = at;
+  armedAt = armed;
+  softMs = length;
   store.set('alarmAt', at);
-  log(`armed for ${clockLabel(new Date(at))}`);
+  store.set('armedAt', armed);
+  store.set('softMs', length);
+  log(`armed for ${clockLabel(new Date(at))}${length ? `, soft wake from ${clockLabel(new Date(softStartAt()))}` : ''}`);
   $('controls').hidden = true;
   drawAlarmStatus();
   $('no-sound-help').hidden = true;
@@ -130,14 +158,85 @@ async function arm(at) {
 }
 
 function disarm(reason, bad = false) {
+  endSoftWake();
+  softBegun = false;
+  softTapAt = null;
+  store.set('softTapAt', null);
   alarmAt = null;
+  armedAt = null;
+  softMs = 0;
   store.set('alarmAt', null);
+  store.set('armedAt', null);
+  store.set('softMs', 0);
   log(reason, bad);
   drawAlarmStatus();
 }
 
+function drawLight(ms) {
+  const progress = softProgress(ms, softStartAt(), alarmAt);
+  $('light').style.backgroundColor = dawnColour(progress);
+  $('light').style.color = inkFor(dawnRgb(progress));
+}
+
+function startSoftWake(ms) {
+  softBegun = true;
+  closeConfirm();
+  $('rearm').hidden = true;
+  drawLight(ms);
+  $('light').hidden = false;
+  const state = engineState();
+  if (state === 'none') {
+    log('soft wake started with no audio engine', true);
+  } else {
+    log(`soft wake started, audio ${state}`, state !== 'running');
+    startChimes(() => (alarmAt === null ? 0 : chimeGain(softProgress(Date.now(), softStartAt(), alarmAt))));
+  }
+  // Not awaited, like the ring's fetch.
+  loadBrief();
+}
+
+function endSoftWake() {
+  stopChimes();
+  $('light').hidden = true;
+}
+
+// Speech has to start inside this tap, so nothing here may wait on a promise first.
+// The alarm stays armed: the alarm time decides whether the owner is still up.
+function greetFromSoftWake() {
+  endSoftWake();
+  softTapAt = Date.now();
+  store.set('softTapAt', softTapAt);
+  log('soft wake tapped');
+  drawBrief();
+  show('brief');
+  $('brief').scrollTop = 0;
+  readBrief();
+  // A reloaded page has no audio engine; this tap is the only chance to start one before the ring.
+  if (engineState() === 'none') startAudio();
+}
+
+// The page's own flag, not the browser's: the line timer always clears it, so it cannot stick.
+function speechRunning() {
+  return reading;
+}
+
+function alarmReached(ms) {
+  if (softTapAt !== null) {
+    if (ownerUp(ms, lastTouch, speechRunning())) {
+      disarm('alarm skipped: owner already up');
+      return;
+    }
+    log('alarm rings: no touch in the 2 minutes after the soft-wake tap');
+    quietReading();
+  } else if (softBegun) {
+    log('alarm rings: soft wake was not tapped');
+  }
+  ring(minutesLate(ms, alarmAt));
+}
+
 async function ring(late) {
   ringing = true;
+  endSoftWake();
   closeConfirm();
   $('rearm').hidden = true;
   $('ring-time').textContent = clockLabel(new Date());
@@ -152,13 +251,23 @@ async function ring(late) {
   log(state === 'running' ? 'alarm tone started' : `alarm tone not playing, audio ${state}`, state !== 'running');
 }
 
+function quietReading() {
+  stopSpeaking();
+  reading = false;
+  $('read').hidden = false;
+  $('hush').hidden = true;
+  $('now-reading').textContent = '';
+}
+
 function readBrief() {
   $('read').hidden = true;
   $('hush').hidden = false;
+  reading = true;
   speak(buildScript(rows, new Date()), {
     onLine: (i, line) => { $('now-reading').textContent = line; },
     onEvent: (event) => log(event, true),
     onDone: () => {
+      reading = false;
       $('now-reading').textContent = '';
       $('read').hidden = false;
       $('hush').hidden = true;
@@ -293,14 +402,17 @@ function tick() {
     log('chime not confirmed', true);
   }
   if (alarmAt === null || ringing) return;
-  const action = dueAction(ms, alarmAt);
-  if (action === 'missed') {
+  const phase = wakePhase(ms, alarmAt, softStartAt());
+  if (phase === 'missed') {
     disarm(`alarm missed: page resumed ${minutesLate(ms, alarmAt)} minutes late`, true);
-  } else if (action === 'ring') {
-    ring(minutesLate(ms, alarmAt));
-  } else if (ms - lastLoad >= refreshEvery(ms, alarmAt)) {
-    loadBrief();
+    return;
   }
+  if (phase === 'ring') { alarmReached(ms); return; }
+  if (phase === 'soft') {
+    if (!softBegun) startSoftWake(ms);
+    else if (!$('light').hidden) drawLight(ms);
+  }
+  if (ms - lastLoad >= refreshEvery(ms, alarmAt)) loadBrief();
 }
 
 let briefNotice = '';
@@ -353,7 +465,12 @@ $('arm').addEventListener('click', () => {
   const time = parseTime($('alarm-time').value);
   if (time) arm(nextAlarm(new Date(), time).getTime());
 });
-$('test').addEventListener('click', () => arm(Date.now() + 60_000));
+$('soft-wake').value = String(softWakeMinutes(store.get('soft', null)));
+$('soft-wake').addEventListener('change', () => store.set('soft', softWakeMinutes(Number($('soft-wake').value))));
+// With soft wake on, the test compresses it to 30 seconds ahead of the one-minute alarm.
+$('test').addEventListener('click', () => {
+  arm(Date.now() + 60_000, softWakeMinutes(store.get('soft', null)) ? TEST_SOFT_MS : 0);
+});
 $('disarm').addEventListener('click', () => disarm('alarm turned off'));
 $('heard').addEventListener('click', () => {
   closeConfirm();
@@ -369,12 +486,15 @@ $('confirm-off').addEventListener('click', () => {
   disarm('alarm turned off at the chime check');
 });
 $('ring').addEventListener('click', stopAlarmAndGreet);
+$('light').addEventListener('click', greetFromSoftWake);
+// Capture phase, so a touch counts even when the control it lands on stops the event.
+document.addEventListener('pointerdown', () => { lastTouch = Date.now(); }, { capture: true, passive: true });
 // A time already past is never stored again; the tick rings it, now with the engine this tap starts.
 $('rearm').addEventListener('click', () => {
   $('rearm').hidden = true;
   if (alarmAt === null) return;
   if (isDue(Date.now(), alarmAt)) startAudio();
-  else arm(alarmAt);
+  else arm(alarmAt, softMs, armedAt);
 });
 $('dim').addEventListener('click', () => {
   const level = (store.get('dim', 2) % 3) + 1;
@@ -405,16 +525,11 @@ $('source-sample').addEventListener('click', async () => {
 });
 $('source-close').addEventListener('click', () => { $('source').hidden = true; });
 $('open-log').addEventListener('click', () => { drawLog(); show('log'); });
-$('back').addEventListener('click', () => { stopSpeaking(); $('read').hidden = false; $('hush').hidden = true; $('now-reading').textContent = ''; show('clock'); });
+$('back').addEventListener('click', () => { quietReading(); show('clock'); });
 $('log-back').addEventListener('click', () => show('clock'));
 $('log-clear').addEventListener('click', () => { store.set('log', []); drawLog(); });
 $('read').addEventListener('click', readBrief);
-$('hush').addEventListener('click', () => {
-  stopSpeaking();
-  $('read').hidden = false;
-  $('hush').hidden = true;
-  $('now-reading').textContent = '';
-});
+$('hush').addEventListener('click', quietReading);
 
 document.addEventListener('visibilitychange', () => {
   if (alarmAt === null) return;
