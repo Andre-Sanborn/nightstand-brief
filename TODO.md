@@ -17,7 +17,9 @@
 - [x] Fetch the brief from a private repository with a token typed into the iPad
 - [x] Refuse to read a brief dated another day
 - [ ] Owner: create the private brief repository and a read-only token
-- [ ] Move the Morning brief task ahead of the alarm and have it write the JSON here
+- [x] Write the brief generator contract and a checker for `brief.json`
+- [ ] Have the brief generator run the checker and refuse to write a brief with errors
+- [ ] Move the Morning brief task ahead of the alarm and have it write `brief.json` to the private repository
 - [ ] Add the news section to the Morning brief task, driven by MISSION.md interests
 - [ ] Send votes back so the next brief's news picks use them
 - [ ] Ask the owner follow-up questions to narrow each news topic

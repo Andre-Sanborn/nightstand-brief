@@ -101,6 +101,22 @@ The spoken script is composed in `app/core/` from the rows, in this order:
 greeting, headline, to-dos, today's calendar, today's weather, news. Email, AI
 notes and tips are on screen only.
 
+The full contract for whoever writes the file is in
+[`generator/README.md`](generator/README.md). `app/core/validate.js` checks a
+brief against it. Errors break the contract: no rows array, an unknown section,
+no `meta` row or more than one, a missing or impossible `meta.date`, an empty
+title on a titled row, a missing or repeated news `id`, a non-numeric
+`hi`/`lo`/`pop`, or more than three news rows. Warnings are worth fixing: a date
+other than today's, no weather, nothing for "Today" on the calendar, a news row
+without `topic` or `detail`, a title over 140 characters, or a link that is not
+`https://`.
+
+A date other than today's is a warning in the checker because the checker may run
+on another day. The app refuses to read such a brief aloud, so the generator
+treats it as an error on the morning it runs.
+
+The checker does not flag a missing or repeated `ord`, or more than four to-dos.
+
 ## Votes
 
 A vote is `{ id, topic, title, vote, at }` where `vote` is `up`, `down` or
