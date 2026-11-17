@@ -73,3 +73,14 @@ test('no more than four to-dos and three news items are read', () => {
   assert.ok(script.includes('You have 6 to-dos.'));
   assert.ok(script.includes('3 things in the news.'));
 });
+
+test('a brief from another day is not read as today\'s', () => {
+  const rows = [
+    { section: 'meta', ord: 0, date: '2026-03-02', title: 'Yesterday\'s headline' },
+    { section: 'todo', ord: 0, title: 'Yesterday\'s task' },
+  ];
+  assert.deepEqual(buildScript(rows, morning), [
+    "Good morning. It's Tuesday, March 3.",
+    "Today's brief has not arrived, so there is nothing new to read.",
+  ]);
+});

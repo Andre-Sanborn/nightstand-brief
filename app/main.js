@@ -2,6 +2,7 @@ import { parseTime, nextAlarm, isDue, formatClock } from './core/alarm.js';
 import { rowsOf, section, text, number } from './core/brief.js';
 import { buildScript } from './core/speech.js';
 import { applyVote, voteFor } from './core/votes.js';
+import { parseSource, briefRequest, isStale } from './core/source.js';
 import { startEngine, engineState, chime, startRing, stopRing } from './audio.js';
 import { speak, stopSpeaking } from './speak.js';
 
@@ -199,6 +200,9 @@ function drawBrief() {
   const keep = $('brief').scrollTop;
   body.replaceChildren();
   const meta = section(rows, 'meta')[0] || {};
+  const notice = isStale(meta, new Date()) ? "Today's brief has not arrived. This is the last one received." : briefNotice;
+  $('brief-notice').textContent = notice;
+  $('brief-notice').hidden = notice === '';
   if (text(meta.title)) body.appendChild(el('h1', 'headline', text(meta.title)));
   body.appendChild(el('p', 'meta', [text(meta.day), text(meta.time)].filter(Boolean).join('  ·  ')));
 
@@ -266,18 +270,44 @@ function tick() {
     drawClock(now);
   }
   if (alarmAt !== null && !ringing && $('rearm').hidden && isDue(now.getTime(), alarmAt)) ring();
+  if (alarmAt !== null && !ringing && now.getTime() - lastLoad >= REFRESH_MS) loadBrief();
 }
 
-async function loadBrief() {
-  try {
+const REFRESH_MS = 10 * 60_000;
+let briefNotice = '';
+let lastLoad = 0;
+// Logged only when the outcome changes, so a night of refreshes does not fill the log.
+let loadFailed = null;
+
+async function fetchRows() {
+  const source = parseSource(store.get('source', null));
+  if (!source) {
+    briefNotice = 'Sample brief. Set a brief source to see your own.';
     const response = await fetch('sample-brief.json', { cache: 'no-store' });
-    rows = rowsOf(await response.json());
-  } catch {
-    rows = [];
-    log('brief failed to load', true);
+    return rowsOf(await response.json());
+  }
+  const request = briefRequest(source);
+  const response = await fetch(request.url, { headers: request.headers, cache: 'no-store' });
+  if (!response.ok) throw new Error(`GitHub answered ${response.status}`);
+  briefNotice = '';
+  return rowsOf(await response.json());
+}
+
+// A failed refresh keeps the rows already on screen; the stale check stops an old brief being read as new.
+async function loadBrief() {
+  lastLoad = Date.now();
+  try {
+    rows = await fetchRows();
+    if (loadFailed !== false) log('brief loaded');
+    loadFailed = false;
+  } catch (err) {
+    briefNotice = `The brief did not load: ${err.message}.`;
+    if (loadFailed !== true) log(`brief failed to load: ${err.message}`, true);
+    loadFailed = true;
   }
   drawWeather();
   drawBrief();
+  return briefNotice;
 }
 
 $('face').addEventListener('click', () => { $('controls').hidden = !$('controls').hidden; });
@@ -306,6 +336,28 @@ $('dim').addEventListener('click', () => {
   document.body.className = `dim-${level}`;
 });
 $('open-brief').addEventListener('click', () => { drawBrief(); show('brief'); });
+$('open-source').addEventListener('click', () => {
+  const saved = store.get('source', null) || {};
+  $('source-repo').value = saved.repo || '';
+  $('source-token').value = saved.token || '';
+  $('source-status').textContent = parseSource(saved) ? `Reading from ${saved.repo}.` : 'Showing the sample brief.';
+  $('source').hidden = false;
+});
+$('source').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const source = parseSource({ repo: $('source-repo').value, token: $('source-token').value });
+  if (!source) { $('source-status').textContent = 'Enter the repository as owner/name and paste the token.'; return; }
+  store.set('source', source);
+  $('source-status').textContent = 'Loading…';
+  const problem = await loadBrief();
+  $('source-status').textContent = problem || `Loaded from ${source.repo}.`;
+});
+$('source-sample').addEventListener('click', async () => {
+  store.set('source', null);
+  await loadBrief();
+  $('source-status').textContent = 'Showing the sample brief.';
+});
+$('source-close').addEventListener('click', () => { $('source').hidden = true; });
 $('open-log').addEventListener('click', () => { drawLog(); show('log'); });
 $('back').addEventListener('click', () => { stopSpeaking(); $('read').hidden = false; $('hush').hidden = true; $('now-reading').textContent = ''; show('clock'); });
 $('log-back').addEventListener('click', () => show('clock'));

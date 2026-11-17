@@ -1,4 +1,5 @@
 import { section, text, number } from './brief.js';
+import { isStale } from './source.js';
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
@@ -74,6 +75,12 @@ function newsLines(rows) {
 // One entry per utterance: short utterances survive where iPadOS cuts long ones off.
 export function buildScript(rows, now) {
   const meta = section(rows, 'meta')[0] || {};
+  if (isStale(meta, now)) {
+    return [
+      `Good morning. It's ${WEEKDAYS[now.getDay()]}, ${MONTHS[now.getMonth()]} ${now.getDate()}.`,
+      "Today's brief has not arrived, so there is nothing new to read.",
+    ];
+  }
   return [
     greeting(meta, now),
     sentence(meta.title),

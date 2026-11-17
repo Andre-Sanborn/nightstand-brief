@@ -95,3 +95,7 @@ button:active { background: var(--muted); }
 .votes button[aria-pressed="true"] { color: #000; background: var(--read); border-color: var(--read); }
 #log-list { padding-left: 1.4em; font-size: 16px; line-height: 1.6; font-variant-numeric: tabular-nums; }
 #log-list .bad { color: #ff8a7a; font-weight: 600; }
+.overlay .field { width: min(100%, 560px); color: var(--read-muted); text-align: left; margin: 0; }
+.overlay input { font: inherit; font-size: 18px; color: var(--read); background: #000; border: 1px solid var(--read-muted);
+  border-radius: 10px; padding: 10px 12px; min-height: 48px; width: 60%; min-width: 0; -webkit-user-select: text; user-select: text; }
+#brief-notice { border: 1px solid var(--read); border-radius: 10px; padding: 10px 14px; font-size: 17px; }

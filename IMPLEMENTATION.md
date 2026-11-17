@@ -119,17 +119,38 @@ brief generator is not built.
 - **Votes stay on the device first.** It proves the interaction before any
   credential is involved.
 
+## How the brief reaches the iPad
+
+The owner chose this route on 2026-11-17 because it costs nothing.
+
+- This repository is public. A GitHub Actions workflow runs the tests and
+  publishes `app/` with GitHub Pages on every push to `main`.
+- Real briefs live in a separate private repository as `brief.json` at its root.
+- The owner types that repository's name and a read-only token into the app's
+  "Brief source" screen. The app stores both in the browser and fetches the file
+  from the GitHub contents API. With no source set, the app shows the sample.
+- While an alarm is set the app refetches every ten minutes, so a brief written
+  before the alarm is picked up without a tap.
+- The `meta` row carries `date` as `YYYY-MM-DD` in the owner's local time. A
+  brief dated another day is not read aloud; the greeting says the brief has not
+  arrived, and the brief view shows a notice.
+- A failed fetch keeps the rows already loaded and logs the failure.
+
+Known limits:
+
+- Every Pages site under one GitHub account shares a browser origin, so another
+  site published from the same account could read the stored token. The token is
+  fine-grained, read-only, and limited to the brief repository.
+- The token expires on the date chosen when it is created. The app then shows
+  "GitHub answered 401" until a new one is typed in.
+- Fetching from the mocked API was checked in headless Chromium on 2026-11-17.
+  It is untested against GitHub and on the iPad.
+
 ## Open
 
-- **How the brief reaches the iPad.** The brief is private and the app must be
-  reachable by the iPad over HTTPS. The planned route: the page is published
-  with no personal data in it, and it fetches the brief from a private
-  repository through the GitHub API with a read-only token typed into the iPad
-  once. Where the page is published is the owner's decision: it turns on
-  repository visibility, a paid GitHub plan, or a second hosting account.
 - **Moving the Morning brief task.** It runs at 7:30 AM on weekdays. It has to
-  finish before a 6:00 AM alarm, write the JSON file to this repository, and add
-  the news section. Weekend behaviour is undecided.
+  finish before a 6:00 AM alarm, write `brief.json` to the private repository
+  with a `date`, and add the news section. Weekend behaviour is undecided.
 - **Live weather on the clock.** The clock shows the forecast from the last
   brief. A direct call to the National Weather Service API would keep the
   current temperature fresh overnight.

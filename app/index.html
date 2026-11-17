@@ -32,6 +32,7 @@
       <button id="dim" type="button">Brightness</button>
       <button id="open-brief" type="button">Open brief</button>
       <button id="open-log" type="button">Night log</button>
+      <button id="open-source" type="button">Brief source</button>
     </div>
     <p class="hint">Tap the clock to hide these.</p>
   </section>
@@ -47,6 +48,19 @@
   </div>
   <p id="no-sound-help" class="hint" hidden>Turn the volume up with the side buttons, check that Silent mode is off in Control Centre, then tap Play it again.</p>
 </div>
+
+<form id="source" class="overlay" hidden>
+  <h2>Brief source</h2>
+  <p id="source-status"></p>
+  <label class="field">Private repository <input id="source-repo" type="text" placeholder="owner/name" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+  <label class="field">Read-only token <input id="source-token" type="password" autocomplete="off"></label>
+  <div class="buttons">
+    <button id="source-save" type="submit">Save and load</button>
+    <button id="source-sample" type="button">Use the sample brief</button>
+    <button id="source-close" type="button">Close</button>
+  </div>
+  <p class="hint">The token stays in this iPad's browser storage and is sent only to api.github.com.</p>
+</form>
 
 <button id="rearm" class="overlay big-tap" type="button" hidden>
   <span class="big">Tap to re-arm</span>
@@ -64,6 +78,7 @@
     <button id="read" type="button">Read aloud</button>
     <button id="hush" type="button" hidden>Stop reading</button>
   </header>
+  <p id="brief-notice" hidden></p>
   <p id="now-reading" aria-live="polite"></p>
   <div id="brief-body"></div>
 </main>

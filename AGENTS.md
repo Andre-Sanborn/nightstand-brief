@@ -96,8 +96,30 @@ at `~/.claude/agents/`; here the team is in the repository.
 | `adversarial-verifier` | work that already exists, and tries to break it | fixes what it finds |
 | `plain-language-editor` | comments, docstrings and prose that fail the writing rules | touches code |
 
-The base's delegation rule stands: do the work yourself by default, and delegate
-when the work is worth a brief. The `strategy-adversary` step is not optional.
+**Delegate whenever possible, and run as much work in parallel as is safe.**
+This is the human's standing instruction, set 2026-11-17, and **it overrides the
+base's "Delegation" rule, which says to do the work yourself by default.** When
+a task can go to a subagent, it goes to a subagent, and independent tasks go out
+together. Two agents must not edit the same files. A task whose brief would take
+longer to write than the work stays with the orchestrator. The
+`strategy-adversary` step is not optional either way.
+
+**Every subagent runs on Opus 5.5, model id `claude-opus-5-5`.** This is the
+human's standing instruction, set 2026-11-17. Each file in `.claude/agents/` pins
+that id. Pass the Opus model when launching any agent, including ones with no
+project definition. Changing an agent's model is the human's call.
+
+### The two-hour project check
+
+Every two hours an adversary reviews the project. The human asked for this on
+2026-11-17. The brief is [`.claude/reviews/project-check.md`](.claude/reviews/project-check.md)
+and the record is [`docs/REVIEW-LOG.md`](docs/REVIEW-LOG.md).
+
+The job is a scheduled task named "Nightstand Brief two-hour project check",
+created with the claude-code-remote `create_trigger` tool. It fires into the
+orchestrator session. At the start of every session, list the scheduled tasks
+with `list_triggers` and recreate it from the brief if it is missing or bound to
+an archived session.
 
 ## Project context
 
@@ -106,9 +128,23 @@ Start at [MISSION.md](MISSION.md). Keep [TODO.md](TODO.md) and
 
 ## Committing
 
-The base Git rule applies unchanged: commit and push only on the human's direct
-instruction. Stage files by name. Update TODO.md in the same commit that
-completes an item.
+The human gave standing permission on 2026-11-17 to commit accepted, verified
+work and to push it to the session's development branch. **This replaces the
+base's requirement of a direct instruction per commit and per push, and nothing
+else about the base Git rule changes.**
+
+The development branch is `claude/wonderful-feynman-7eq6yb`. Push with:
+
+```bash
+git push -u origin claude/wonderful-feynman-7eq6yb
+```
+
+- **`main` and pull requests need the human's word each time.** The app is
+  published from `main`, so a merge there changes what the iPad runs.
+- **Stage files by name.** Never `git commit -a` while a delegated agent is
+  editing the tree.
+- Commit only work that has been verified and accepted.
+- **Update TODO.md in the same commit** that completes an item.
 
 Commits use the git identity the environment configures. Never add the human's
 name or email to a commit, a header, a URL or a payload.
@@ -127,16 +163,19 @@ Editing the text inside a live document is an ordinary edit, not a deletion.
 
 The morning brief summarises the human's email, calendar and to-dos.
 
-- **This repository stays private.** Changing its visibility is the human's
-  decision.
-- **A real brief never enters a public place**: not a public host, not an issue,
-  not a published artifact, not a log.
+**This repository is public, or about to be.** The human decided on 2026-11-17
+to publish the app from it with GitHub Pages. Write every file, commit message
+and log line as something a stranger can read.
+
+- **A real brief never enters this repository**, and never a public host, an
+  issue, a published artifact or a log. Real briefs live in a separate private
+  repository that the iPad reads with a token.
 - **Fixtures are invented.** Sample briefs and test data use made-up people,
-  events and messages. Never copy a real brief into `app/` or `tests/`.
-- **Nothing private is published with the app.** Whatever serves `app/` to the
-  iPad serves only that directory.
+  events and messages.
 - **A token never enters the repository.** A credential the iPad needs is typed
   into the iPad and stays in that browser's storage.
+- **Nothing about the human beyond what MISSION.md already states** goes into
+  this repository: no name, email, address, account, schedule detail or contact.
 - The model API, the GitHub remote and documentation services need no approval.
   When a tool would send brief content somewhere new, that is a scope question.
 

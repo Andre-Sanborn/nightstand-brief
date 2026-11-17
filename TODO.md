@@ -6,13 +6,17 @@
 - [x] Build the pure core: next alarm time, spoken script, vote records
 - [x] Build the dim red clock page with Arm, alarm tone, stop-tap greeting and brief view
 - [x] Add thumbs up, thumbs down and "nothing like this" on news items, stored on the device
-- [ ] Publish `app/` somewhere the iPad can open over HTTPS
+- [x] Add the workflow that publishes `app/` with GitHub Pages from `main`
+- [ ] Owner: make the repository public and turn on GitHub Pages
+- [ ] Merge the development branch to `main` and confirm the page loads
 - [ ] Device test 1: one-minute alarm on the iPad, tone and speech both heard
 - [ ] Device test 2: arm overnight, read the night log in the morning
 
 ## Real brief
 
-- [ ] Decide how the private brief reaches the iPad and build the fetch
+- [x] Fetch the brief from a private repository with a token typed into the iPad
+- [x] Refuse to read a brief dated another day
+- [ ] Owner: create the private brief repository and a read-only token
 - [ ] Move the Morning brief task ahead of the alarm and have it write the JSON here
 - [ ] Add the news section to the Morning brief task, driven by MISSION.md interests
 - [ ] Send votes back so the next brief's news picks use them
