@@ -9,8 +9,7 @@ wakes its owner and reads them the morning brief.
    in dim red on black, like an iPhone in StandBy.
 2. **Soft wake.** A few minutes before the alarm, gentle chimes begin and the
    screen brightens slowly from black to white.
-3. **Alarm.** At the set time an alarm tone plays, unless the owner is already
-   up.
+3. **Alarm.** At the set time an alarm tone plays.
 4. **Greeting.** A tap stops the sound. The app says good morning and reads the
    highlights: the headline, today's to-dos and calendar, the weather, and the
    top three news items.

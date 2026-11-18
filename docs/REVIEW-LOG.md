@@ -1,8 +1,21 @@
 # Review log
 
-Last reviewed commit: 9f90189
+Last reviewed commit: 1f6e823
 
 Newest entry first.
+
+## 2026-11-17, two-hour project check, commits 7441b58 and 1f6e823
+
+Reviewer: strategy-adversary.
+
+| Finding | Decision |
+|---|---|
+| A tap on the light counted as a touch, so a sleepy tap in the last two minutes cancelled the alarm; a reading in progress cancelled it too. Measured in the browser. | Fixed. The alarm always rings. Only an explicit button cancels it. |
+| MISSION.md said the alarm plays "unless the owner is already up", which the owner never asked for. | Removed. |
+| The notes overstated what "tap then doze rings" covered. | Fixed with the rule change. |
+| A reloaded page's light hid the notice that the alarm needs a tap. | Fixed. The light says so. |
+| No stale tap state, no double ring, and no way to arm or disarm under the light. | Recorded. |
+| The first scheduled brief run could fail to fire with nobody noticing. | Accepted. The orchestrator checks the private brief's date after the run. |
 
 ## 2026-11-17, two-hour project check, commit 9f90189
 

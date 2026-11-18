@@ -54,10 +54,13 @@ brightens slowly over a few minutes.
   apart, from very quiet to moderate. They are synthesised, so no audio file is
   shipped.
 - A tap on the light opens the brief and starts the greeting. It leaves the
-  alarm armed. On a reloaded page that tap also starts the audio engine.
-- At the alarm time after a tap: if the page is still reading aloud, or was
-  touched in the last two minutes, the alarm is skipped and logged. Otherwise it
-  rings, because the owner tapped and fell asleep again.
+  alarm armed. On a reloaded page that tap also starts the audio engine, and the
+  light says the alarm is silent until tapped.
+- The alarm always rings at the alarm time. A tap on the light, a reading in
+  progress and later touches do not cancel it, because none of them shows the
+  owner is awake. A reading in progress is stopped when the tone starts.
+- While an alarm is set, the brief view shows "I'm up: alarm off". That button
+  and "Turn alarm off" in the controls are the only ways to cancel.
 - With no tap, the alarm tone starts at the alarm time and the light is hidden.
 - Starting the soft wake closes the chime check and the re-arm screen, and
   starts a brief fetch.
@@ -67,12 +70,12 @@ A web page cannot raise the iPad's backlight, so the white is as bright as the
 iPad's own brightness setting. The in-app brightness levels change the clock's
 colours only.
 
-Checked in headless Chromium on 2026-11-17: the light's timing and colours, one
-chime at a time and none after a stop, tap then doze rings, tap then touch
-skips, arming inside the window, a reloaded page, and soft wake off. Untested on
-the iPad: whether chimes play from an audio context idle all night, how the
-colours look on the panel, and whether the tap on a reloaded page can start
-audio and speech together.
+Checked in headless Chromium: the light's timing and colours, one chime at a
+time and none after a stop, arming inside the window, a reloaded page, soft wake
+off, and that a tap on the light at any point still leaves the alarm ringing at
+the alarm time. Untested on the iPad: whether chimes play from an audio context
+idle all night, how the colours look on the panel, and whether the tap on a
+reloaded page can start audio and speech together.
 
 ## iPad behaviour the design depends on
 

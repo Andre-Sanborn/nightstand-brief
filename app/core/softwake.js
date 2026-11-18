@@ -5,7 +5,6 @@ const MINUTE = 60_000;
 export const SOFT_WAKE_MINUTES = [0, 3, 5, 10];
 export const DEFAULT_SOFT_WAKE_MINUTES = 5;
 // A touch this recent at the alarm time means the owner is up and the alarm is skipped.
-export const AWAKE_WINDOW_MS = 2 * MINUTE;
 
 // A pentatonic scale has no clashing pair, so any note can follow any other.
 export const CHIME_HZ = [392.0, 440.0, 523.25, 587.33, 659.25, 783.99];
@@ -102,12 +101,4 @@ export function nextNote(previous, random) {
   let i = Math.min(Math.floor(clamp01(random) * choices), choices - 1);
   if (hasPrevious && i >= previous) i += 1;
   return i;
-}
-
-// After a soft-wake tap: speech still playing or a recent touch means the owner is up.
-export function ownerUp(nowMs, lastTouchMs, speaking) {
-  if (speaking) return true;
-  if (lastTouchMs === null || lastTouchMs === undefined) return false;
-  const since = nowMs - lastTouchMs;
-  return since >= 0 && since <= AWAKE_WINDOW_MS;
 }

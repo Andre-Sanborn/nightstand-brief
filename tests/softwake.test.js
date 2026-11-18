@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { dueAction } from '../app/core/alarm.js';
 import {
   softWakeMinutes, softStart, wakePhase, softProgress, dawnRgb, dawnColour, inkFor, LIGHT_INK, DARK_INK,
-  chimeGain, chimeGapMs, nextNote, CHIME_HZ, ownerUp, AWAKE_WINDOW_MS,
+  chimeGain, chimeGapMs, nextNote, CHIME_HZ,
 } from '../app/core/softwake.js';
 
 const MIN = 60_000;
@@ -160,14 +160,3 @@ test('nextNote with no previous note can pick any note, and stays in range at r 
   assert.equal(nextNote(0, 0), 1);
 });
 
-test('the owner is up while speech plays or within 2 minutes of a touch', () => {
-  const alarm = 1_000 * MIN;
-  assert.equal(AWAKE_WINDOW_MS, 2 * MIN);
-  assert.equal(ownerUp(alarm, null, true), true);
-  assert.equal(ownerUp(alarm, null, false), false);
-  assert.equal(ownerUp(alarm, alarm - MIN, false), true);
-  assert.equal(ownerUp(alarm, alarm - 2 * MIN, false), true);
-  assert.equal(ownerUp(alarm, alarm - 2 * MIN - 1, false), false);
-  // Tapped at 6:27 for a 6:30 alarm, then nothing.
-  assert.equal(ownerUp(alarm, alarm - 3 * MIN, false), false);
-});

@@ -13,7 +13,7 @@
 - [x] Add the soft wake: chimes and a brightening screen before the alarm
 - [ ] Device test 1: one-minute alarm on the iPad, soft wake, tone and speech all work
 - [ ] Device test 2: arm overnight, read the night log in the morning
-- [ ] Device test 3: tap during the soft wake, then lie still; the alarm should ring
+- [ ] Device test 3: tap during the soft wake; the alarm should still ring at the alarm time
 
 ## Real brief
 

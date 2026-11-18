@@ -3,7 +3,7 @@ import { rowsOf, section, text, number } from './core/brief.js';
 import { buildScript } from './core/speech.js';
 import { applyVote, voteFor } from './core/votes.js';
 import { parseSource, briefRequest, isStale } from './core/source.js';
-import { softWakeMinutes, softStart, wakePhase, softProgress, dawnRgb, dawnColour, inkFor, chimeGain, ownerUp } from './core/softwake.js';
+import { softWakeMinutes, softStart, wakePhase, softProgress, dawnRgb, dawnColour, inkFor, chimeGain } from './core/softwake.js';
 import { startEngine, engineState, chime, startRing, stopRing, startChimes, stopChimes } from './audio.js';
 import { speak, stopSpeaking } from './speak.js';
 
@@ -41,7 +41,6 @@ let armedAt = store.get('armedAt', null);
 let softMs = store.get('softMs', 0) || 0;
 let softBegun = false;
 let softTapAt = store.get('softTapAt', null);
-let lastTouch = null;
 let reading = false;
 let ringing = false;
 // When the chime check closes itself if nobody answers it.
@@ -103,6 +102,7 @@ function drawAlarmStatus() {
   $('arm').hidden = armed;
   $('test').hidden = armed;
   $('disarm').hidden = !armed;
+  $('im-up').hidden = !armed;
 }
 
 async function holdWakeLock() {
@@ -185,6 +185,9 @@ function startSoftWake(ms) {
   drawLight(ms);
   $('light').hidden = false;
   const state = engineState();
+  $('light-text').textContent = state === 'none'
+    ? 'Tap to hear your brief. The page restarted, so the alarm is silent until you tap.'
+    : 'Tap to hear your brief';
   if (state === 'none') {
     log('soft wake started with no audio engine', true);
   } else {
@@ -215,18 +218,10 @@ function greetFromSoftWake() {
   if (engineState() === 'none') startAudio();
 }
 
-// The page's own flag, not the browser's: the line timer always clears it, so it cannot stick.
-function speechRunning() {
-  return reading;
-}
-
 function alarmReached(ms) {
+  // The alarm never infers that the owner is up: a sleepy tap on the light must not cancel it.
   if (softTapAt !== null) {
-    if (ownerUp(ms, lastTouch, speechRunning())) {
-      disarm('alarm skipped: owner already up');
-      return;
-    }
-    log('alarm rings: no touch in the 2 minutes after the soft-wake tap');
+    log('alarm rings after a soft-wake tap');
     quietReading();
   } else if (softBegun) {
     log('alarm rings: soft wake was not tapped');
@@ -488,7 +483,6 @@ $('confirm-off').addEventListener('click', () => {
 $('ring').addEventListener('click', stopAlarmAndGreet);
 $('light').addEventListener('click', greetFromSoftWake);
 // Capture phase, so a touch counts even when the control it lands on stops the event.
-document.addEventListener('pointerdown', () => { lastTouch = Date.now(); }, { capture: true, passive: true });
 // A time already past is never stored again; the tick rings it, now with the engine this tap starts.
 $('rearm').addEventListener('click', () => {
   $('rearm').hidden = true;
@@ -530,6 +524,7 @@ $('log-back').addEventListener('click', () => show('clock'));
 $('log-clear').addEventListener('click', () => { store.set('log', []); drawLog(); });
 $('read').addEventListener('click', readBrief);
 $('hush').addEventListener('click', quietReading);
+$('im-up').addEventListener('click', () => disarm('alarm turned off from the brief'));
 
 document.addEventListener('visibilitychange', () => {
   if (alarmAt === null) return;
