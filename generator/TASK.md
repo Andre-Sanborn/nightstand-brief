@@ -23,7 +23,8 @@ report in a few lines.
 
 1. Work out today's date and weekday in America/Boise time. That date is
    `meta.date`.
-2. Read the previous `brief.json` from the private repository, if there is one.
+2. Update the clone of the private repository with `git pull --ff-only origin
+   main`. Read the previous `brief.json` from it, if there is one.
    Use it only to avoid repeating a news story and to keep a recurring story's
    `id` the same. Where a step says "since the previous brief" and there is
    none, use the last 48 hours.
@@ -42,10 +43,17 @@ report in a few lines.
    - **To-dos**: at most four things that need action today or within three
      days, drawn from the calendar and the email above. Most urgent first. The
      `tag` says when: "Today", "Tomorrow", a weekday, or "Overdue". Each is
-     something the reader does, worded as an action. A deadline today is written
-     once, as a to-do; its calendar row is left out of today's `cal` rows, and a
-     reminder event for the same deadline is left out too, so nothing is read
-     twice.
+     something the reader does, worded as an action. The title carries the
+     deadline time, such as "Send the form by noon", because only the title is
+     read aloud. A deadline today is written once, as a to-do; its calendar row
+     is left out of today's `cal` rows, and a reminder event for the same
+     deadline is left out too, so nothing is read twice. A deadline that does
+     not fit in the four to-dos keeps its `cal` row. If no `cal` row for today
+     remains, write the one row titled "Nothing scheduled".
+   - **Security alerts in spoken text.** The headline and the to-do titles are
+     read aloud in a room. There a security alert is only "Check a security
+     alert in your email", with no service or account named. The `email` row,
+     which is shown and not spoken, carries the detail.
    - **Weather**: the National Weather Service forecast for Boise, Idaho. Run
      this from the root of a clone of this repository and use the rows it prints
      unchanged:
@@ -84,8 +92,10 @@ report in a few lines.
    private repository, replacing the previous one, with the commit message
    "Brief for YYYY-MM-DD". Write it with git from a clone of that repository:
    commit under the identity the environment configures and
-   `git push origin main`. Use the GitHub file-update tool only if the push is
-   refused; that tool writes the commit under the owner's own name and email.
+   `git push origin main`. If the push is rejected because the clone is behind,
+   pull and push again. Use the GitHub file-update tool only if the push is
+   refused for permission or sign-in; that tool writes the commit under the
+   owner's own name and email.
 8. Read the file back from the repository and confirm its `meta.date`.
 
 ## When something fails

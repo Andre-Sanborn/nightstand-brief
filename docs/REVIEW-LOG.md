@@ -1,8 +1,22 @@
 # Review log
 
-Last reviewed commit: fdba8f7
+Last reviewed commit: 99fdf60
 
 Newest entry first.
+
+## 2026-11-18, two-hour project check, commit 99fdf60
+
+Reviewer: strategy-adversary. Subject: the tightened task instructions, read as
+the next morning's agent would read them.
+
+| Finding | Decision |
+|---|---|
+| Dropping a deadline's calendar row lost its spoken time. | Fixed. The to-do title carries the time. |
+| A clone that is behind made the run fall back to the tool that commits under the owner's name, and could show an old previous brief. | Fixed. The run pulls first, and only a permission refusal allows the fallback. |
+| A fifth deadline was dropped from both the to-dos and the calendar. | Fixed. It keeps its calendar row. |
+| Today's calendar could come out empty with no "Nothing scheduled" row. | Fixed. |
+| A security alert could be read aloud with the service named. | Fixed. Spoken text names no service. |
+| The limits agree across the contract, the task and the checker, and the new test pins the boundary. | Recorded. |
 
 ## 2026-11-18, two-hour project check: the first scheduled brief
 
