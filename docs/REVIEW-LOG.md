@@ -1,8 +1,23 @@
 # Review log
 
-Last reviewed commit: 201c6d1
+Last reviewed commit: fdba8f7
 
 Newest entry first.
+
+## 2026-11-18, two-hour project check: the first scheduled brief
+
+Reviewer: strategy-adversary. Subject: commit fdba8f7 and the brief the first
+scheduled run wrote. The notes' wording about the run holds up. Tomorrow's run
+may go ahead.
+
+| Finding | Decision |
+|---|---|
+| A kept account-recovery alert was worded as routine. | Fixed in the task instructions. Raised with the owner directly. |
+| The headline described the owner's own task as if it would happen by itself. | Fixed in the task instructions. |
+| Deadlines were read up to four times, and five to-dos were written when four are read. | Fixed. A deadline today is written once, to-dos are capped at four, and the checker warns above four. |
+| Course codes may be read badly by the voice. | Left until the owner hears one on the iPad. |
+| One news figure could not be confirmed against a primary source. | Open. The cloud environment blocks most news sites; a short list of allowed hosts goes to the owner. |
+| The brief's commit in the private repository carried the owner's name and email. | Fixed. The run writes with git under the agent identity. The repository is private. |
 
 ## 2026-11-18, two-hour project check, commit 201c6d1
 

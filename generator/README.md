@@ -54,7 +54,7 @@ section is ignored.
 
 | Field | Required | Use |
 |---|---|---|
-| `title` | Yes | The task, such as "Return the library books". Read aloud. Only the first four to-dos are read. |
+| `title` | Yes | The task, such as "Return the library books". Read aloud. Only the first four to-dos are read, so write at most four. |
 | `tag` | No | When it is due, such as "Today" or "Friday". Read aloud before the title, as "Today: Return the library books." |
 | `detail` | No | One sentence of context. Shown. |
 
@@ -138,6 +138,7 @@ Errors:
 
 Warnings:
 
+- There are more than four `todo` rows; only the first four are read.
 - `meta.date` is not the local date of `now`. When the generator runs the check
   on the morning of the brief, treat this as an error: the app will not read the
   brief aloud.

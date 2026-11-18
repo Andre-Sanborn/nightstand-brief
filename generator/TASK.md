@@ -34,11 +34,18 @@ report in a few lines.
    - **Email**: the last two days, or since the previous brief. Keep only
      messages from a real person that need a reply, messages with a deadline,
      and security alerts that ask for action or say to check whether it was you.
-     A security notice that only confirms something the reader did is skipped. Skip marketing, receipts, newsletters
-     and automated notices with nothing to act on. At most five `email` rows.
-   - **To-dos**: at most five things that need action today or within three
+     A security notice that only confirms something the reader did is skipped.
+     A kept security alert says what happened and asks whether it was the
+     reader; a password reset or account recovery is never presented as
+     routine. Skip marketing, receipts, newsletters and automated notices with
+     nothing to act on. At most five `email` rows.
+   - **To-dos**: at most four things that need action today or within three
      days, drawn from the calendar and the email above. Most urgent first. The
-     `tag` says when: "Today", "Tomorrow", a weekday, or "Overdue".
+     `tag` says when: "Today", "Tomorrow", a weekday, or "Overdue". Each is
+     something the reader does, worded as an action. A deadline today is written
+     once, as a to-do; its calendar row is left out of today's `cal` rows, and a
+     reminder event for the same deadline is left out too, so nothing is read
+     twice.
    - **Weather**: the National Weather Service forecast for Boise, Idaho. Run
      this from the root of a clone of this repository and use the rows it prints
      unchanged:
@@ -66,7 +73,8 @@ report in a few lines.
 4. Write the `meta` row: `date`, a `day` line such as
    "Tuesday · March 3 2026", a `time` line giving the actual time of writing,
    such as "Ready 5:20 AM", and a `title` of one sentence naming what matters
-   most today.
+   most today. Where that is something the reader must do, the sentence says so:
+   "You need to send the form by noon", never "The form goes out at noon".
 5. Write everything for the ear, as the contract's "Writing for the ear" section
    says.
 6. Check the file with the command in the contract's checker section, run from
@@ -74,7 +82,10 @@ report in a few lines.
    with an error is never written.
 7. Write the file as `brief.json` at the root of the default branch of the
    private repository, replacing the previous one, with the commit message
-   "Brief for YYYY-MM-DD". Prefer the GitHub file-update tool; fall back to git.
+   "Brief for YYYY-MM-DD". Write it with git from a clone of that repository:
+   commit under the identity the environment configures and
+   `git push origin main`. Use the GitHub file-update tool only if the push is
+   refused; that tool writes the commit under the owner's own name and email.
 8. Read the file back from the repository and confirm its `meta.date`.
 
 ## When something fails

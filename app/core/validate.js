@@ -100,6 +100,8 @@ export function validateBrief(json, now) {
 
   const newsCount = rows.filter((r) => r.section === 'news').length;
   if (newsCount > MAX_NEWS) errors.push(`There are ${newsCount} news rows; there must be at most ${MAX_NEWS}.`);
+  const todos = rows.filter((r) => r.section === 'todo').length;
+  if (todos > 4) warnings.push(`There are ${todos} todo rows, and only the first four are read.`);
   if (!rows.some((r) => r.section === 'wx')) warnings.push('There are no wx rows, so no weather is read.');
   if (!rows.some((r) => r.section === 'cal' && /^today\b/i.test(text(r.day)))) {
     warnings.push('No cal row has a day starting with "Today".');

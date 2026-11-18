@@ -184,3 +184,18 @@ test('warning: a link that does not start with https://', () => {
     'email ord 0: link does not start with https://.',
   ]);
 });
+
+test('warning: more to-dos than are read aloud', () => {
+  const extra = (rows) => [
+    ...rows,
+    { section: 'todo', ord: 2, title: 'Water the plants' },
+    { section: 'todo', ord: 3, title: 'Pay the water bill' },
+    { section: 'todo', ord: 4, title: 'Book the car service' },
+  ];
+  // The sample has two to-dos; three more makes five.
+  assert.deepEqual(validateBrief(brief(extra), morning).warnings, [
+    'There are 5 todo rows, and only the first four are read.',
+  ]);
+  const four = (rows) => extra(rows).slice(0, -1);
+  assert.deepEqual(validateBrief(brief(four), morning).warnings, []);
+});
