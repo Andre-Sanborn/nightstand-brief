@@ -60,7 +60,8 @@ brightens slowly over a few minutes.
   progress and later touches do not cancel it, because none of them shows the
   owner is awake. A reading in progress is stopped when the tone starts.
 - While an alarm is set, the brief view shows "I'm up: alarm off" at the far end
-  of its bar. It needs a second tap within five seconds. That button and "Turn
+  of its bar. It needs a second tap within five seconds, and a second tap in
+  the first 0.6 seconds is ignored as a double-tap. That button and "Turn
   alarm off" in the controls are the only ways to cancel.
 - The always-ring rule has no pure test, because it is the absence of a
   decision. The browser check covers it.

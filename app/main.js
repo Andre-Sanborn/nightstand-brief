@@ -20,6 +20,9 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
   'September', 'October', 'November', 'December'];
 const LOG_LIMIT = 300;
 const IM_UP_LABEL = "I'm up: alarm off";
+const IM_UP_MIN_GAP_MS = 600;
+const IM_UP_WINDOW_MS = 5000;
+let imUpAt = 0;
 const VOTE_LABELS = [['up', 'More like this'], ['down', 'Less like this'], ['never', 'Nothing like this']];
 
 // Storage can throw in private windows; the clock must still run without it.
@@ -159,6 +162,7 @@ async function arm(at, length = softWakeMinutes(store.get('soft', null)) * MINUT
 }
 
 function disarm(reason, bad = false) {
+  resetImUp();
   endSoftWake();
   softBegun = false;
   softTapAt = null;
@@ -524,18 +528,22 @@ $('log-back').addEventListener('click', () => show('clock'));
 $('log-clear').addEventListener('click', () => { store.set('log', []); drawLog(); });
 $('read').addEventListener('click', readBrief);
 $('hush').addEventListener('click', quietReading);
-// Two taps, because this sits beside "Stop reading" and a sleepy tap must not cancel the alarm.
-let imUpUntil = 0;
+// Two taps, because a sleepy tap must not cancel the alarm. A second tap sooner than
+// IM_UP_MIN_GAP_MS is a double-tap or a finger bounce and does not count.
+function resetImUp() {
+  imUpAt = 0;
+  $('im-up').textContent = IM_UP_LABEL;
+}
 $('im-up').addEventListener('click', () => {
-  if (Date.now() <= imUpUntil) {
-    imUpUntil = 0;
-    $('im-up').textContent = IM_UP_LABEL;
+  const since = Date.now() - imUpAt;
+  if (imUpAt && since < IM_UP_MIN_GAP_MS) return;
+  if (imUpAt && since <= IM_UP_WINDOW_MS) {
     disarm('alarm turned off from the brief');
     return;
   }
-  imUpUntil = Date.now() + 5000;
+  imUpAt = Date.now();
   $('im-up').textContent = 'Tap again to turn the alarm off';
-  setTimeout(() => { if (imUpUntil && Date.now() > imUpUntil) { imUpUntil = 0; $('im-up').textContent = IM_UP_LABEL; } }, 5100);
+  setTimeout(() => { if (imUpAt && Date.now() - imUpAt > IM_UP_WINDOW_MS) resetImUp(); }, IM_UP_WINDOW_MS + 100);
 });
 
 document.addEventListener('visibilitychange', () => {

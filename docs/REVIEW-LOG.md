@@ -1,8 +1,17 @@
 # Review log
 
-Last reviewed commit: 300790f
+Last reviewed commit: afd038d
 
 Newest entry first.
+
+## 2026-11-17, two-hour project check, commit afd038d
+
+Reviewer: strategy-adversary.
+
+| Finding | Decision |
+|---|---|
+| A quick double-tap on "I'm up: alarm off" cancelled the alarm. | Fixed. A second tap within 0.6 seconds is ignored. |
+| A pending first tap survived a cancel from the controls and a re-arm. | Fixed. Disarming clears it. |
 
 ## 2026-11-17, two-hour project check, commit 300790f
 
