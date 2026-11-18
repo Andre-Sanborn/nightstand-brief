@@ -19,6 +19,7 @@ const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
   'September', 'October', 'November', 'December'];
 const LOG_LIMIT = 300;
+const IM_UP_LABEL = "I'm up: alarm off";
 const VOTE_LABELS = [['up', 'More like this'], ['down', 'Less like this'], ['never', 'Nothing like this']];
 
 // Storage can throw in private windows; the clock must still run without it.
@@ -204,7 +205,7 @@ function endSoftWake() {
 }
 
 // Speech has to start inside this tap, so nothing here may wait on a promise first.
-// The alarm stays armed: the alarm time decides whether the owner is still up.
+// The alarm stays armed and still rings at the alarm time.
 function greetFromSoftWake() {
   endSoftWake();
   softTapAt = Date.now();
@@ -482,7 +483,6 @@ $('confirm-off').addEventListener('click', () => {
 });
 $('ring').addEventListener('click', stopAlarmAndGreet);
 $('light').addEventListener('click', greetFromSoftWake);
-// Capture phase, so a touch counts even when the control it lands on stops the event.
 // A time already past is never stored again; the tick rings it, now with the engine this tap starts.
 $('rearm').addEventListener('click', () => {
   $('rearm').hidden = true;
@@ -524,7 +524,19 @@ $('log-back').addEventListener('click', () => show('clock'));
 $('log-clear').addEventListener('click', () => { store.set('log', []); drawLog(); });
 $('read').addEventListener('click', readBrief);
 $('hush').addEventListener('click', quietReading);
-$('im-up').addEventListener('click', () => disarm('alarm turned off from the brief'));
+// Two taps, because this sits beside "Stop reading" and a sleepy tap must not cancel the alarm.
+let imUpUntil = 0;
+$('im-up').addEventListener('click', () => {
+  if (Date.now() <= imUpUntil) {
+    imUpUntil = 0;
+    $('im-up').textContent = IM_UP_LABEL;
+    disarm('alarm turned off from the brief');
+    return;
+  }
+  imUpUntil = Date.now() + 5000;
+  $('im-up').textContent = 'Tap again to turn the alarm off';
+  setTimeout(() => { if (imUpUntil && Date.now() > imUpUntil) { imUpUntil = 0; $('im-up').textContent = IM_UP_LABEL; } }, 5100);
+});
 
 document.addEventListener('visibilitychange', () => {
   if (alarmAt === null) return;

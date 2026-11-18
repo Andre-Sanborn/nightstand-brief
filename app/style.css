@@ -107,3 +107,4 @@ button:active { background: var(--muted); }
 .overlay input { font: inherit; font-size: 18px; color: var(--read); background: #000; border: 1px solid var(--read-muted);
   border-radius: 10px; padding: 10px 12px; min-height: 48px; width: 60%; min-width: 0; -webkit-user-select: text; user-select: text; }
 #brief-notice { border: 1px solid var(--read); border-radius: 10px; padding: 10px 14px; font-size: 17px; }
+#im-up { margin-left: auto; }

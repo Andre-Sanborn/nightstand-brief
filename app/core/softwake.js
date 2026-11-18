@@ -4,7 +4,6 @@ const MINUTE = 60_000;
 
 export const SOFT_WAKE_MINUTES = [0, 3, 5, 10];
 export const DEFAULT_SOFT_WAKE_MINUTES = 5;
-// A touch this recent at the alarm time means the owner is up and the alarm is skipped.
 
 // A pentatonic scale has no clashing pair, so any note can follow any other.
 export const CHIME_HZ = [392.0, 440.0, 523.25, 587.33, 659.25, 783.99];

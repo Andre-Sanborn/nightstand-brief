@@ -59,8 +59,11 @@ brightens slowly over a few minutes.
 - The alarm always rings at the alarm time. A tap on the light, a reading in
   progress and later touches do not cancel it, because none of them shows the
   owner is awake. A reading in progress is stopped when the tone starts.
-- While an alarm is set, the brief view shows "I'm up: alarm off". That button
-  and "Turn alarm off" in the controls are the only ways to cancel.
+- While an alarm is set, the brief view shows "I'm up: alarm off" at the far end
+  of its bar. It needs a second tap within five seconds. That button and "Turn
+  alarm off" in the controls are the only ways to cancel.
+- The always-ring rule has no pure test, because it is the absence of a
+  decision. The browser check covers it.
 - With no tap, the alarm tone starts at the alarm time and the light is hidden.
 - Starting the soft wake closes the chime check and the re-arm screen, and
   starts a brief fetch.

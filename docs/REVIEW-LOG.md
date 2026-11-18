@@ -1,8 +1,18 @@
 # Review log
 
-Last reviewed commit: 1f6e823
+Last reviewed commit: 300790f
 
 Newest entry first.
+
+## 2026-11-17, two-hour project check, commit 300790f
+
+Reviewer: strategy-adversary. The fix works and nothing is half-removed.
+
+| Finding | Decision |
+|---|---|
+| "I'm up: alarm off" sat beside "Stop reading" and cancelled on one tap. | Fixed. It moved to the far end of the bar and needs two taps. |
+| Three comments still described the removed rule. | Fixed. |
+| No pure test pins the always-ring rule. | Left. A function that always returns "ring" tests nothing; the browser check covers the behaviour. |
 
 ## 2026-11-17, two-hour project check, commits 7441b58 and 1f6e823
 
