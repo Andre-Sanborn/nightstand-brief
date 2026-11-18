@@ -1,8 +1,16 @@
 # Review log
 
-Last reviewed commit: 99fdf60
+Last reviewed commit: 1777506
 
 Newest entry first.
+
+## 2026-11-18, two-hour project check, commit 1777506
+
+Reviewer: strategy-adversary. The five fixes read cleanly.
+
+| Finding | Decision |
+|---|---|
+| The step that reads the previous brief did not say what to do with no clone or a failed pull. | Fixed. The scheduled task's own prompt already creates and updates the clone; the instructions now give the fallback and require the report to say so. |
 
 ## 2026-11-18, two-hour project check, commit 99fdf60
 

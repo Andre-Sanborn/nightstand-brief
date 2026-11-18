@@ -24,7 +24,10 @@ report in a few lines.
 1. Work out today's date and weekday in America/Boise time. That date is
    `meta.date`.
 2. Update the clone of the private repository with `git pull --ff-only origin
-   main`. Read the previous `brief.json` from it, if there is one.
+   main`. The run's caller says where that clone is. Read the previous
+   `brief.json` from it, if there is one. If there is no clone or the pull
+   fails, read the previous brief with the GitHub file tool, and if that fails
+   too, say in the report that the previous brief could not be read.
    Use it only to avoid repeating a news story and to keep a recurring story's
    `id` the same. Where a step says "since the previous brief" and there is
    none, use the last 48 hours.
