@@ -35,6 +35,9 @@ Consider each finding and decide. Put the report and the decisions at the top of
 docs/REVIEW-LOG.md, update "Last reviewed commit" to the reviewed HEAD, and
 commit and push. Record any changed decision in IMPLEMENTATION.md.
 
+A commit that changes only docs/REVIEW-LOG.md or this brief records a review
+and is not itself reviewed.
+
 When there are no new commits and no uncommitted decisions, do not launch the
 adversary and change no file. Say in one line that the period had no decisions,
 and stop.

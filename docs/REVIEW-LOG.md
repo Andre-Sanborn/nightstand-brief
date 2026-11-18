@@ -1,8 +1,14 @@
 # Review log
 
-Last reviewed commit: afd038d
+Last reviewed commit: 201c6d1
 
 Newest entry first.
+
+## 2026-11-18, two-hour project check, commit 201c6d1
+
+Reviewer: strategy-adversary. Nothing found. If the iPad's clock jumps backwards
+between the two taps, the brief's alarm-off button ignores taps until the clock
+catches up; "Turn alarm off" in the controls still works. Left as is.
 
 ## 2026-11-17, two-hour project check, commit afd038d
 
