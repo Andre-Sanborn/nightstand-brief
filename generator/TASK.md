@@ -96,9 +96,10 @@ report in a few lines.
    "Brief for YYYY-MM-DD". Write it with git from a clone of that repository:
    commit under the identity the environment configures and
    `git push origin main`. If the push is rejected because the clone is behind,
-   pull and push again. Use the GitHub file-update tool only if the push is
-   refused for permission or sign-in; that tool writes the commit under the
-   owner's own name and email.
+   pull and push again. Use the GitHub file-update tool only if there is no
+   clone, or the push is refused for permission or sign-in; that tool writes
+   the commit under the owner's own name and email. Say in the report which
+   way the file was written.
 8. Read the file back from the repository and confirm its `meta.date`.
 
 ## When something fails

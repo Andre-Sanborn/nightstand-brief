@@ -1,8 +1,16 @@
 # Review log
 
-Last reviewed commit: 1777506
+Last reviewed commit: 1e9aab5
 
 Newest entry first.
+
+## 2026-11-18, two-hour project check, commit 1e9aab5
+
+Reviewer: strategy-adversary.
+
+| Finding | Decision |
+|---|---|
+| The read step allowed a run with no clone, but the write step still required one. | Fixed. With no clone the file is written with the GitHub file tool, and the report says which way was used. |
 
 ## 2026-11-18, two-hour project check, commit 1777506
 
