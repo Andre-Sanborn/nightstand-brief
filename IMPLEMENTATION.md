@@ -264,8 +264,11 @@ A trial run by hand on 2026-11-17 took about six minutes and wrote a brief that
 passed the checker, with mail, calendar, AI notes and three news items. It had
 no weather, because that session could not then reach the forecast; the weather
 rows were added afterwards by a one-off script. Its news sources were checked
-against search summaries, not fetched articles. A scheduled firing into the
-orchestrator session is unproven until the first morning.
+against search summaries, not fetched articles. The first scheduled firing ran on
+2026-11-18: it fired at 5:19 AM, the brief was written at 5:23 AM, and the
+checker reported no errors and no warnings. That run could not open three news
+sites from the cloud environment, so its news was confirmed from search results
+only.
 
 The weather rows come from `generator/weather.mjs`, which pipes the forecast
 through `forecastRows` in `app/core/forecast.js`. It drops periods that are over, including a

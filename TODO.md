@@ -25,7 +25,7 @@
 - [x] Write the instructions the daily brief task follows, including the checker step
 - [x] Create the daily brief task
 - [ ] Owner: create a durable daily brief task on the routines page, with repositories and connectors
-- [ ] Confirm one scheduled run writes a valid `brief.json`
+- [x] Confirm one scheduled run writes a valid `brief.json`
 - [ ] Send votes back so the next brief's news picks use them
 - [ ] Ask the owner follow-up questions to narrow each news topic
 
