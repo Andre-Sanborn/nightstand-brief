@@ -35,7 +35,10 @@ report in a few lines.
    - **Calendar**: events from today through three days ahead. Today's rows have
      a `day` beginning with the word "Today". If today is empty, write one row
      titled "Nothing scheduled".
-   - **Email**: the last two days, or since the previous brief. Keep only
+   - **Email**: the last two days. Also carry forward any `email` row from the
+     previous brief that states a deadline which has not passed, unless the mail
+     shows it was dealt with; such a row leaves the brief only when its deadline
+     passes. Keep only
      messages from a real person that need a reply, messages with a deadline,
      and security alerts that ask for action or say to check whether it was you.
      A security notice that only confirms something the reader did is skipped.

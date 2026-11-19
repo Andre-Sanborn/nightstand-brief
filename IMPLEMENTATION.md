@@ -277,6 +277,11 @@ pairs each day with the night after it, and on an evening run keeps
 tonight as today with a low and no high. The agent copies the rows and does not
 compute them.
 
+The second scheduled run, on 2026-11-19, wrote its brief with git under the
+agent identity. It dropped an email whose deadline was still four days away,
+because the email had aged out of the two-day window. The instructions now carry
+such a row forward until its deadline passes.
+
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.
 
