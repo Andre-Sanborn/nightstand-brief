@@ -1,8 +1,13 @@
 # Review log
 
-Last reviewed commit: 15248a0
+Last reviewed commit: f04aabb
 
 Newest entry first.
+
+## 2026-11-19, two-hour project check, commit f04aabb
+
+Reviewer: strategy-adversary. Nothing found. The daily run's pin moved to
+f04aabb.
 
 ## 2026-11-19, two-hour project check, commits 270c08b and 15248a0
 
