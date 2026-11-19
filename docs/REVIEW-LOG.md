@@ -1,8 +1,19 @@
 # Review log
 
-Last reviewed commit: fcbc8f3
+Last reviewed commit: 15248a0
 
 Newest entry first.
+
+## 2026-11-19, two-hour project check, commits 270c08b and 15248a0
+
+Reviewer: strategy-adversary. No blocker; the daily run's pin moved to 15248a0.
+
+| Finding | Decision |
+|---|---|
+| The open-deadline rule gave two different exits for a kept message. | Fixed. It leaves when the deadline passes, mail shows it was handled, or it is over fourteen days old. |
+| Nothing said which rows to drop above five. | Fixed. Nearest deadlines stay; a security alert and a reply owed always stay. |
+| A marketing "offer ends" message could be kept by the new rule. | Fixed. Such messages pass the same filter as any other. |
+| The notes left out how a kept message leaves. | Fixed. |
 
 ## 2026-11-18, two-hour project check, commit fcbc8f3
 

@@ -36,16 +36,19 @@ report in a few lines.
      a `day` beginning with the word "Today". If today is empty, write one row
      titled "Nothing scheduled".
    - **Email**: the last two days. Also search the last fourteen days for
-     messages that state a deadline which has not passed, and keep each one
-     unless later mail shows it was dealt with; such a message leaves the brief
-     only when its deadline passes. Keep only
+     messages that state a deadline which has not passed. Such a message passes
+     the same filter as any other, and leaves the brief when its deadline
+     passes, later mail shows it was dealt with, or it is over fourteen days
+     old. Keep only
      messages from a real person that need a reply, messages with a deadline,
      and security alerts that ask for action or say to check whether it was you.
      A security notice that only confirms something the reader did is skipped.
      A kept security alert says what happened and asks whether it was the
      reader; a password reset or account recovery is never presented as
      routine. Skip marketing, receipts, newsletters and automated notices with
-     nothing to act on. At most five `email` rows.
+     nothing to act on. At most five `email` rows; when there are more, keep
+     the nearest deadlines, and always keep a security alert and a reply owed
+     to a person.
    - **To-dos**: at most four things that need action today or within three
      days, drawn from the calendar and the email above. Most urgent first. The
      `tag` says when: "Today", "Tomorrow", a weekday, or "Overdue". Each is

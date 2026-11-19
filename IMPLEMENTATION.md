@@ -279,8 +279,9 @@ compute them.
 
 The second scheduled run, on 2026-11-19, wrote its brief with git under the
 agent identity. It dropped an email whose deadline was still four days away,
-because the email had aged out of the two-day window. The instructions now carry
-such a row forward until its deadline passes.
+because the email had aged out of the two-day window. The instructions now search
+the last fourteen days for such messages and keep each until its deadline
+passes or later mail shows it was handled.
 
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.
