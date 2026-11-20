@@ -90,8 +90,12 @@ report in a few lines.
      name the day it falls on and the night it ends: "just before 1 AM Monday,
      late Sunday night". Never write a time after midnight with only the
      earlier day's name.
-   - **A planned task today** that is not a deadline follows the same rule as a
-     deadline: when it is a to-do, its calendar row is left out.
+   - **Events the reader attends** at a set time, such as an appointment, a
+     class or a meeting, are never to-dos. They stay as `cal` rows, which carry
+     the time and the place.
+   - **A reminder to do a task today**, with no place to be, follows the same
+     rule as a deadline: when it is a to-do, its title carries the time and its
+     calendar row is left out.
 4. Write the `meta` row: `date`, a `day` line such as
    "Tuesday · March 3 2026", a `time` line giving the actual time of writing,
    such as "Ready 5:20 AM", and a `title` of one sentence naming what matters

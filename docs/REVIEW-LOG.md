@@ -1,8 +1,16 @@
 # Review log
 
-Last reviewed commit: f04aabb
+Last reviewed commit: ed1cf1c
 
 Newest entry first.
+
+## 2026-11-20, two-hour project check, commit ed1cf1c
+
+Reviewer: strategy-adversary. The after-midnight rule has no contradiction.
+
+| Finding | Decision |
+|---|---|
+| "A planned task today" could turn an appointment into a to-do and drop its time and place. | Fixed. Events the reader attends are never to-dos; only a reminder to do a task follows the deadline rule. |
 
 ## 2026-11-19, two-hour project check, commit f04aabb
 
