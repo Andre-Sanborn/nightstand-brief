@@ -283,6 +283,11 @@ because the email had aged out of the two-day window. The instructions now searc
 the last fourteen days for such messages and keep each until its deadline
 passes or later mail shows it was handled.
 
+The third scheduled run, on 2026-11-20, used the open-deadline search and
+brought the security alert back into the brief. It wrote a deadline that falls
+after midnight Mountain time with only the earlier day's name; the instructions
+now name both the day and the night.
+
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.
 

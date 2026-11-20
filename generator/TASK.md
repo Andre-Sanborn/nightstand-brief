@@ -86,7 +86,12 @@ report in a few lines.
      "AI and tech", "Markets and the economy", "Outdoors, caving and Idaho",
      "World and US".
    - **Times** are written in Mountain time. A deadline the calendar holds in
-     another zone is converted.
+     another zone is converted. When the converted time falls after midnight,
+     name the day it falls on and the night it ends: "just before 1 AM Monday,
+     late Sunday night". Never write a time after midnight with only the
+     earlier day's name.
+   - **A planned task today** that is not a deadline follows the same rule as a
+     deadline: when it is a to-do, its calendar row is left out.
 4. Write the `meta` row: `date`, a `day` line such as
    "Tuesday · March 3 2026", a `time` line giving the actual time of writing,
    such as "Ready 5:20 AM", and a `title` of one sentence naming what matters
