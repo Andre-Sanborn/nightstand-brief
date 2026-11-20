@@ -1,8 +1,13 @@
 # Review log
 
-Last reviewed commit: ed1cf1c
+Last reviewed commit: 32e4adb
 
 Newest entry first.
+
+## 2026-11-20, two-hour project check, commit 32e4adb
+
+Reviewer: strategy-adversary. Nothing found. The daily run's pin moved to
+32e4adb.
 
 ## 2026-11-20, two-hour project check, commit ed1cf1c
 
