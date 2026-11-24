@@ -43,6 +43,8 @@ report in a few lines.
      messages from a real person that need a reply, messages with a deadline,
      and security alerts that ask for action or say to check whether it was you.
      A security notice that only confirms something the reader did is skipped.
+     A security alert that asks whether it was the reader stays for seven days,
+     unless later mail shows it was resolved.
      A kept security alert says what happened and asks whether it was the
      reader; a password reset or account recovery is never presented as
      routine. Skip marketing, receipts, newsletters and automated notices with
@@ -57,7 +59,9 @@ report in a few lines.
      read aloud. A deadline today is written once, as a to-do; its calendar row
      is left out of today's `cal` rows, and a reminder event for the same
      deadline is left out too, so nothing is read twice. A deadline that does
-     not fit in the four to-dos keeps its `cal` row. If no `cal` row for today
+     not fit in the four to-dos keeps its `cal` row. A to-do for a later day
+     keeps its `cal` row on that day: only today's calendar is read aloud, so
+     only today's rows can repeat a to-do. If no `cal` row for today
      remains, write the one row titled "Nothing scheduled".
    - **Security alerts in spoken text.** The headline and the to-do titles are
      read aloud in a room. There a security alert is only "Check a security

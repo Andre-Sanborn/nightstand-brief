@@ -288,6 +288,10 @@ brought the security alert back into the brief. It wrote a deadline that falls
 after midnight Mountain time with only the earlier day's name; the instructions
 now name both the day and the night.
 
+The run on 2026-11-24 dropped an unanswered sign-in alert once it was two days
+old. The instructions now keep such an alert for seven days unless mail shows
+it was resolved.
+
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.
 
