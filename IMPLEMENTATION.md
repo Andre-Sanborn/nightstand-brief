@@ -288,9 +288,10 @@ brought the security alert back into the brief. It wrote a deadline that falls
 after midnight Mountain time with only the earlier day's name; the instructions
 now name both the day and the night.
 
-The run on 2026-11-24 dropped an unanswered sign-in alert once it was two days
-old. The instructions now keep such an alert for seven days unless mail shows
-it was resolved.
+A kept security alert keeps its row for seven days, found by a seven-day
+search, unless mail shows it was resolved. It is spoken only in its first 48
+hours, because answering an alert on the provider's
+page usually sends no mail, and the room should not hear it all week.
 
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.

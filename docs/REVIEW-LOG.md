@@ -1,8 +1,27 @@
 # Review log
 
-Last reviewed commit: 32e4adb
+Last reviewed commit: 17303c9
 
 Newest entry first.
+
+## 2026-11-24, two-hour project check, commit 17303c9
+
+Reviewer: strategy-adversary, two passes.
+
+- The seven-day alert rule had no search that fetched the mail. Fixed: the
+  email step searches seven days for security alerts.
+- An unresolved alert would be spoken for seven days, and several alerts could
+  crowd out deadlines. Fixed: an alert is spoken only in its first 48 hours, and
+  the five-row cap keeps the two newest alerts, then replies owed, then the
+  nearest deadlines.
+- The second pass found the limits covered only one kind of alert. Fixed: they
+  cover every kept security alert.
+- A note in IMPLEMENTATION.md was more specific than the Privacy section
+  allows. Reworded. The earlier wording remains in the branch history; removing
+  it is the owner's call.
+- The later-day to-do rule: nothing found.
+
+The daily run's pin moves to the commit that carries these fixes.
 
 ## 2026-11-20, two-hour project check, commit 32e4adb
 
