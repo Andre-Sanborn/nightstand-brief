@@ -1,8 +1,21 @@
 # Review log
 
-Last reviewed commit: 17303c9
+Last reviewed commit: 647a6af
 
 Newest entry first.
+
+## 2026-11-24, two-hour project check, commit 647a6af
+
+Reviewer: strategy-adversary. No contradiction, impossible step or privacy
+problem. Two edge cases, both accepted as they stand:
+
+- With more than five email rows, two older alerts and replies owed outrank a
+  distant deadline. Accepted: an unanswered alert matters more than a deadline
+  over three days away, and the deadline returns as a to-do when it is near.
+- With three alerts under 48 hours old, the third is spoken but its row is cut.
+  Accepted: the two shown alerts already send the reader to their mail.
+
+The daily run's pin moved to 647a6af.
 
 ## 2026-11-24, two-hour project check, commit 17303c9
 
