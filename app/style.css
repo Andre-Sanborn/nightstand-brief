@@ -26,7 +26,14 @@ body {
     max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
-#clock { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+/* Spacers centre the column but, unlike justify-content, never push it past the top edge. */
+#clock { display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
+#clock::before, #clock::after, #confirm::before, #confirm::after, #source::before, #source::after {
+  content: ""; flex: 1 0 0;
+}
+/* A smaller, still clock while the controls are open, so both fit on screen in landscape. */
+#clock.controls-open #face { transform: none !important; }
+#clock.controls-open #time-row { font-size: min(20vw, 24vh); }
 #face { text-align: center; transition: transform 2s ease; }
 #time-row { display: flex; align-items: baseline; justify-content: center; gap: 0.12em; font-size: min(30vw, 52vh); line-height: 0.95; }
 #time { font-weight: 200; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
@@ -34,8 +41,10 @@ body {
 #date, #weather, #alarm-status { margin: 0.5em 0 0; font-size: clamp(16px, 2.6vw, 30px); color: var(--muted); }
 #weather { color: var(--fg); }
 
-#controls { width: min(100%, 560px); border: 1px solid var(--muted); border-radius: 16px; padding: 16px; }
-.field { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 20px; margin-bottom: 16px; }
+#controls { width: min(100%, 640px); flex-shrink: 0; margin-top: 16px; border: 1px solid var(--muted); border-radius: 16px; padding: 16px; }
+.field { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; font-size: 20px; margin-bottom: 16px; }
+.field select { max-width: 100%; min-width: 0; }
+.voice-field select { flex: 1 1 12em; }
 input[type="time"], select {
   font: inherit; font-size: 24px; color: var(--fg); background: #000;
   border: 1px solid var(--muted); border-radius: 10px; padding: 8px 12px; min-height: 48px;
@@ -51,12 +60,14 @@ button:active { background: var(--muted); }
 .overlay {
   position: fixed; inset: 0; z-index: 10; background: #000; color: var(--read);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 18px; padding: 24px; text-align: center; border: 0; border-radius: 0;
+  gap: 18px; text-align: center; border: 0; border-radius: 0; overflow-y: auto;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
 }
 .overlay h2 { font-size: clamp(26px, 5vw, 44px); font-weight: 400; margin: 0; }
 .overlay p { font-size: 20px; margin: 0; color: var(--read-muted); max-width: 32em; }
 .overlay button { color: var(--read); border-color: var(--read); font-size: 22px; padding: 16px 24px; }
-.overlay .buttons { justify-content: center; }
+.overlay .buttons { justify-content: center; max-width: 100%; }
 .big-tap { width: 100%; font-size: 22px; color: var(--read-muted); }
 .big-tap .big { font-size: clamp(40px, 10vw, 110px); font-weight: 300; color: var(--read); }
 .ringing { animation: flash 1.2s steps(1) infinite; }
@@ -76,11 +87,16 @@ button:active { background: var(--muted); }
 @media (prefers-reduced-motion: reduce) { #light { transition: none; } }
 
 #brief, #log {
-  overflow-y: auto; -webkit-overflow-scrolling: touch; color: var(--read);
+  padding-top: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; color: var(--read);
   -webkit-user-select: text; user-select: text;
 }
 #brief > *, #log > * { max-width: 760px; margin-inline: auto; }
-.bar { display: flex; gap: 10px; position: sticky; top: 0; background: #000; padding-bottom: 12px; z-index: 1; }
+/* The bar holds the top safe-area padding, so it sticks at the very top and its black
+   background covers the status bar strip as the brief scrolls beneath it. */
+.bar {
+  display: flex; flex-wrap: wrap; gap: 10px; position: sticky; top: 0; background: #000; z-index: 1;
+  padding: max(16px, env(safe-area-inset-top)) 0 12px;
+}
 .bar button { color: var(--read); border-color: var(--read-muted); }
 #now-reading { min-height: 1.5em; font-size: 20px; margin: 4px auto 12px; }
 .headline { font-size: clamp(22px, 3.4vw, 32px); font-weight: 400; line-height: 1.3; margin: 0 0 4px; }

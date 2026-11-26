@@ -18,7 +18,8 @@ const replace = (rows, section, ord, fields) =>
 
 test('the dated sample brief passes with nothing to report', () => {
   // Every titled row has a title, the news ids differ, wx numbers are numbers,
-  // two cal rows are "Today", no title nears 140 characters, and there are no links.
+  // two cal rows are "Today", no title nears 140 characters, there are no links,
+  // and the six spoken rows hold 124 words.
   assert.deepEqual(validateBrief(brief(), morning), { ok: true, errors: [], warnings: [] });
 });
 
@@ -38,9 +39,9 @@ test('error: a row without a known section', () => {
   const result = validateBrief(brief((rows) => [...rows, { section: 'sports', ord: 0, title: 'A game' }, { ord: 5 }, null]), morning);
   assert.equal(result.ok, false);
   assert.deepEqual(result.errors, [
-    'Row 17 (ord 0) has an unknown section "sports".',
-    'Row 18 (ord 5) has an unknown section "".',
-    'Row 19 is not an object.',
+    'Row 23 (ord 0) has an unknown section "sports".',
+    'Row 24 (ord 5) has an unknown section "".',
+    'Row 25 is not an object.',
   ]);
 });
 
@@ -198,4 +199,33 @@ test('warning: more to-dos than are read aloud', () => {
   ]);
   const four = (rows) => extra(rows).slice(0, -1);
   assert.deepEqual(validateBrief(brief(four), morning).warnings, []);
+});
+
+test('error: a spoken row with empty or missing text', () => {
+  const result = validateBrief(brief((rows) => {
+    const out = replace(rows, 'spoken', 1, { text: '  ' });
+    return replace(out, 'spoken', 3, { text: undefined });
+  }), morning);
+  assert.deepEqual(result.errors, ['spoken ord 1: text is empty.', 'spoken ord 3: text is empty.']);
+});
+
+test('warning: no spoken rows, and an older brief without them stays valid', () => {
+  const result = validateBrief(brief((rows) => rows.filter((r) => r.section !== 'spoken')), morning);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.errors, []);
+  assert.deepEqual(result.warnings, ['There are no spoken rows, so the app reads its own plainer script.']);
+});
+
+test('warning: a narration over 450 words in total', () => {
+  const words = (n) => Array.from({ length: n }, () => 'word').join(' ');
+  const narration = (a, b) => (rows) => [
+    ...rows.filter((r) => r.section !== 'spoken'),
+    { section: 'spoken', ord: 0, text: words(a) },
+    { section: 'spoken', ord: 1, text: `  ${words(b)}\n` },
+  ];
+  // 300 + 151 = 451 words is one too many; 300 + 150 = 450 is the limit.
+  assert.deepEqual(validateBrief(brief(narration(300, 151)), morning).warnings, [
+    'The spoken rows hold 451 words; keep the narration to 450.',
+  ]);
+  assert.deepEqual(validateBrief(brief(narration(300, 150)), morning).warnings, []);
 });

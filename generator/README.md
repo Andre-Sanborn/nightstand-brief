@@ -33,12 +33,13 @@ Every row has two fields:
 
 | Field | Meaning |
 |---|---|
-| `section` | One of `meta`, `todo`, `cal`, `wx`, `wx_note`, `news`, `ai`, `email`, `tip`. |
+| `section` | One of `meta`, `todo`, `cal`, `wx`, `wx_note`, `news`, `ai`, `email`, `tip`, `spoken`. |
 | `ord` | A number. Rows in a section are shown and read in `ord` order, lowest first. Start at 0. |
 
 The other fields depend on the section. "Read aloud" means the field goes into
-the spoken script. "Shown" means it is on screen only. A field not listed for a
-section is ignored.
+the app's own spoken script, which it uses only when the brief has no `spoken`
+rows. "Shown" means it is on screen only. A field not listed for a section is
+ignored.
 
 ### `meta`: exactly one row
 
@@ -117,6 +118,39 @@ These are on screen and never read aloud.
 `ai` holds first-party AI release notes. `email` holds messages that need the
 reader. `tip` holds one short tip.
 
+### `spoken`: the narration
+
+The narration is the brief written to be heard. When a brief has `spoken`
+rows, the app reads them aloud in `ord` order and reads nothing else. They are
+never shown on screen. A brief without them is still valid: the app then
+composes its own plainer script from the fields marked "Read aloud" above.
+
+| Field | Required | Use |
+|---|---|---|
+| `text` | Yes | One short paragraph. The app splits it into sentences and speaks each as its own utterance, because iPadOS cuts long utterances off. |
+
+A sentence ends at a full stop, question mark or exclamation mark followed by a
+space. Write no abbreviations with full stops, such as "Dr." or "a.m.", or the
+sentence breaks there.
+
+Write the narration as follows.
+
+- **Length**: 250 to 350 words in total, across about six to eight rows.
+- **Order**: a warm greeting that names the day; what needs doing today; today's
+  calendar; the weather; the three news items; a gentle close. One row per part
+  is a good shape.
+- **Facts**: it narrates the three `news` rows and the `todo` rows already in the
+  brief, and today's `cal` and `wx` rows. It adds no new fact, story, task or
+  event.
+- **For the ear**: no symbols, URLs, abbreviations or lists. Say times the way
+  people say them: "half past nine", "a quarter to two", "noon".
+- **Voice**: warm, calm and wise, like a kind storyteller waking someone gently.
+  Speak to the reader as "you". Never imitate a named character or a real
+  person. No archaic pastiche: no "thee", "hark" or "once upon a time".
+- **Privacy**: every rule for spoken text applies. It is heard in a room. A
+  security alert is only "a security alert in your email", with no service or
+  account named.
+
 ## What the checker enforces
 
 `validateBrief(json, now)` in `app/core/validate.js` returns
@@ -127,7 +161,7 @@ can.
 Errors:
 
 - The file is not an object with a `rows` array.
-- A row is not an object, or its `section` is not one of the nine above.
+- A row is not an object, or its `section` is not one of the ten above.
 - There is no `meta` row, or more than one.
 - `meta.date` is missing, is not `YYYY-MM-DD`, or is not a real date.
 - A `todo`, `cal`, `news`, `ai`, `email` or `tip` row has an empty `title`.
@@ -135,6 +169,7 @@ Errors:
 - A `wx` row has `hi`, `lo` or `pop` that is present but not a number. A
   number or a string such as `"52"` passes. `"52°"` fails.
 - There are more than three `news` rows.
+- A `spoken` row has an empty `text`.
 
 Warnings:
 
@@ -147,6 +182,8 @@ Warnings:
 - A `news` row has no `topic` or no `detail`.
 - Any row's `title` is longer than 140 characters.
 - A `link` does not start with `https://`.
+- There are no `spoken` rows, so the app reads its own plainer script.
+- The `spoken` rows hold more than 450 words in total.
 
 To run the check, clone this repository and run this from its root, with the
 path to the new brief and the run time's zone:
@@ -203,9 +240,10 @@ Until it is, pick from MISSION.md alone.
 
 ## Writing for the ear
 
-The app speaks `meta.greeting`, `meta.title`, to-do titles and tags, today's
-calendar times and titles, today's weather, and news titles and details. Write
-those fields so a speech voice reads them well.
+The app speaks the `spoken` rows. Without them, it speaks `meta.greeting`,
+`meta.title`, to-do titles and tags, today's calendar times and titles, today's
+weather, and news titles and details. Write all of those fields so a speech
+voice reads them well.
 
 - Write words, not symbols. Write "and", not "&". Write "percent" and
   "degrees", not "%" and "°".
@@ -215,12 +253,14 @@ those fields so a speech voice reads them well.
 - Write dates as words: "Friday" or "March 6", not "3/6".
 - Spell out abbreviations a voice may misread, unless they are said as letters
   (such as "NASA" or "AI").
-- Keep each sentence short. Each line is spoken as its own utterance.
+- Keep each sentence short. Each line, and each sentence of a `spoken` row, is
+  spoken as its own utterance.
 
 ## Example
 
 An invented brief for Tuesday, March 3, 2026. Every person, event and story in
-it is made up.
+it is made up. Its narration is cut short to keep the example small; a real
+one runs 250 to 350 words.
 
 ```json
 {
@@ -247,7 +287,13 @@ it is made up.
       "detail": "The map adds two miles of passage and will be published this spring.", "source": "Sample Grotto" },
     { "section": "email", "ord": 0, "title": "A neighbor asked to borrow the ladder", "detail": "They need it Saturday." },
     { "section": "tip", "ord": 0, "tag": "iPad", "title": "Swipe down from the top right",
-      "detail": "Opens Control Centre, where the brightness slider is." }
+      "detail": "Opens Control Centre, where the brightness slider is." },
+    { "section": "spoken", "ord": 0, "text": "Good morning. It's Tuesday, the third of March, and there's no need to hurry." },
+    { "section": "spoken", "ord": 1, "text": "Before the library closes today, the books want to go back." },
+    { "section": "spoken", "ord": 2, "text": "Your one appointment is the dentist, from two until a quarter to three." },
+    { "section": "spoken", "ord": 3, "text": "It will be partly sunny, with a high of fifty-two. Rain comes tomorrow." },
+    { "section": "spoken", "ord": 4, "text": "In the news, a sample lab has released a smaller language model that runs on phones. A sample central bank held its rate steady. And volunteers have finished mapping a sample cave." },
+    { "section": "spoken", "ord": 5, "text": "That's everything. Rise slowly, and go gently." }
   ]
 }
 ```

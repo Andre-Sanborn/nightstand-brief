@@ -5,7 +5,7 @@ import { applyVote, voteFor } from './core/votes.js';
 import { parseSource, briefRequest, isStale } from './core/source.js';
 import { softWakeMinutes, softStart, wakePhase, softProgress, dawnRgb, dawnColour, inkFor, chimeGain } from './core/softwake.js';
 import { startEngine, engineState, chime, startRing, stopRing, startChimes, stopChimes } from './audio.js';
-import { speak, stopSpeaking } from './speak.js';
+import { speak, stopSpeaking, loadVoices } from './speak.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, content) => {
@@ -23,6 +23,7 @@ const IM_UP_LABEL = "I'm up: alarm off";
 const IM_UP_MIN_GAP_MS = 600;
 const IM_UP_WINDOW_MS = 5000;
 let imUpAt = 0;
+const TRY_LINE = 'Good morning. The kettle is on, and the day can wait a moment.';
 const VOTE_LABELS = [['up', 'More like this'], ['down', 'Less like this'], ['never', 'Nothing like this']];
 
 // Storage can throw in private windows; the clock must still run without it.
@@ -150,7 +151,7 @@ async function arm(at, length = softWakeMinutes(store.get('soft', null)) * MINUT
   store.set('armedAt', armed);
   store.set('softMs', length);
   log(`armed for ${clockLabel(new Date(at))}${length ? `, soft wake from ${clockLabel(new Date(softStartAt()))}` : ''}`);
-  $('controls').hidden = true;
+  showControls(false);
   drawAlarmStatus();
   $('no-sound-help').hidden = true;
   $('confirm').hidden = false;
@@ -264,6 +265,7 @@ function readBrief() {
   $('hush').hidden = false;
   reading = true;
   speak(buildScript(rows, new Date()), {
+    voice: chosenVoice(),
     onLine: (i, line) => { $('now-reading').textContent = line; },
     onEvent: (event) => log(event, true),
     onDone: () => {
@@ -458,7 +460,45 @@ async function loadBrief() {
   return briefNotice;
 }
 
-$('face').addEventListener('click', () => { $('controls').hidden = !$('controls').hidden; });
+function chosenVoice() {
+  return store.get('voice', '') || null;
+}
+
+const isEnglish = (lang) => /^en([-_]|$)/i.test(lang);
+const byLangThenName = (a, b) => a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name);
+let voicesLogged = false;
+
+// English voices first, so the likely choices are near the top of a long list.
+async function drawVoices() {
+  const voices = await loadVoices();
+  if (!voicesLogged) {
+    voicesLogged = true;
+    log(`${voices.length} speech voices found`, voices.length === 0);
+  }
+  const english = voices.filter((v) => isEnglish(v.lang)).sort(byLangThenName);
+  const rest = voices.filter((v) => !isEnglish(v.lang)).sort(byLangThenName);
+  const select = $('voice');
+  const options = [new Option('iPad default', '')];
+  for (const v of [...english, ...rest]) {
+    options.push(new Option(`${v.name}, ${v.lang}${v.localService === false ? ', online only' : ''}`, v.name));
+  }
+  select.replaceChildren(...options);
+  const saved = chosenVoice();
+  select.value = saved && voices.some((v) => v.name === saved) ? saved : '';
+}
+
+function showControls(open) {
+  $('controls').hidden = !open;
+  $('clock').classList.toggle('controls-open', open);
+  if (open) drawVoices();
+}
+
+$('face').addEventListener('click', () => showControls($('controls').hidden));
+$('voice').addEventListener('change', () => store.set('voice', $('voice').value));
+// Speech has to start inside this tap.
+$('try-voice').addEventListener('click', () => {
+  speak([TRY_LINE], { voice: chosenVoice(), onEvent: (event) => log(event, true) });
+});
 $('alarm-time').value = store.get('time', '06:30');
 $('alarm-time').addEventListener('change', () => store.set('time', $('alarm-time').value));
 $('arm').addEventListener('click', () => {
@@ -566,6 +606,7 @@ if (alarmAt !== null) {
 }
 
 drawAlarmStatus();
+drawVoices();
 tick();
 setInterval(tick, 1000);
 loadBrief();

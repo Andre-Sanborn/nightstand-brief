@@ -75,6 +75,19 @@ function newsLines(rows) {
   return [lead, ...shown.map((r) => [sentence(r.title), sentence(r.detail)].filter(Boolean).join(' '))];
 }
 
+// A full stop, question mark or exclamation mark, then a space, ends a sentence.
+// The generator writes no abbreviations, so "Dr. Okafor" is not expected.
+export function sentences(paragraph) {
+  return text(paragraph)
+    .split(/(?<=[.!?]["'”’)]*)\s+/)
+    .map(forEar)
+    .filter(Boolean);
+}
+
+function narration(rows) {
+  return section(rows, 'spoken').flatMap((r) => sentences(r.text));
+}
+
 // One entry per utterance: short utterances survive where iPadOS cuts long ones off.
 export function buildScript(rows, now) {
   const meta = section(rows, 'meta')[0] || {};
@@ -84,6 +97,8 @@ export function buildScript(rows, now) {
       "Today's brief has not arrived, so there is nothing new to read.",
     ];
   }
+  const spoken = narration(rows);
+  if (spoken.length) return spoken;
   return [
     greeting(meta, now),
     sentence(meta.title),

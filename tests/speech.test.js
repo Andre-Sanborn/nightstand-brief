@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { rowsOf } from '../app/core/brief.js';
-import { buildScript, forEar } from '../app/core/speech.js';
+import { buildScript, forEar, sentences } from '../app/core/speech.js';
 
 const sample = rowsOf(JSON.parse(readFileSync(new URL('../app/sample-brief.json', import.meta.url), 'utf8')));
+const withoutSpoken = sample.filter((r) => r.section !== 'spoken');
 const morning = new Date('2026-03-03T06:30:00-07:00');
 
 test('forEar rewrites symbols a voice reads badly', () => {
@@ -28,8 +29,8 @@ test('forEar reads a dash between times or numbers as "to", and leaves bare hyph
   assert.equal(forEar('Route 66 – Chicago'), 'Route 66, Chicago');
 });
 
-test('the sample brief is read in the planned order', () => {
-  assert.deepEqual(buildScript(sample, morning), [
+test('without spoken rows, the sample brief is read in the planned order', () => {
+  assert.deepEqual(buildScript(withoutSpoken, morning), [
     "Good morning. It's Tuesday, March 3.",
     'A quiet morning, then the dentist at two, and the library books are due.',
     'You have 2 to-dos.',
@@ -142,4 +143,83 @@ test('a to-do with an empty or missing title is not counted or read', () => {
 test('a to-do list of blank titles says nothing needs you', () => {
   const rows = [{ section: 'todo', ord: 0, title: '' }];
   assert.ok(buildScript(rows, morning).includes('Nothing needs you this morning.'));
+});
+
+test('the sample narration is read in ord order, one sentence per line', () => {
+  assert.deepEqual(buildScript(sample, morning), [
+    'Good morning.',
+    "It's Tuesday, the third of March, and the house is still quiet.",
+    'Take your time waking.',
+    "There's one thing to do today.",
+    'The library books are due back at the Maple Street branch before it closes.',
+    'And by Friday, Jordan is waiting on that packing list.',
+    'The dentist expects you at two this afternoon.',
+    'Then, at half past six, dinner with Sam and Priya.',
+    'Outside, it will be partly sunny and cool, with a high of fifty-two.',
+    'The rain waits until tomorrow.',
+    'In the news, a sample chip maker has opened a new plant.',
+    'A sample central bank is holding its rates steady.',
+    'And volunteers have finished surveying a sample cave.',
+    "That's all for now.",
+    "Breathe slowly, and rise when you're ready.",
+  ]);
+});
+
+test('spoken rows are ordered by ord, not by their place in the file', () => {
+  const rows = [
+    { section: 'spoken', ord: 2, text: 'Third.' },
+    { section: 'meta', ord: 0, title: 'Not read when there is a narration' },
+    { section: 'spoken', ord: 0, text: 'First.' },
+    { section: 'todo', ord: 0, title: 'Not read either' },
+    { section: 'spoken', ord: 1, text: 'Second.' },
+  ];
+  assert.deepEqual(buildScript(rows, morning), ['First.', 'Second.', 'Third.']);
+});
+
+test('a narration splits after . ? and ! followed by a space, keeping closing quotes', () => {
+  assert.deepEqual(sentences('Awake yet? Not quite! She said "soon." Then  the kettle.'), [
+    'Awake yet?',
+    'Not quite!',
+    'She said "soon."',
+    'Then the kettle.',
+  ]);
+  // No space after the point, so a decimal or a hyphenated number stays whole.
+  assert.deepEqual(sentences('A high of 52.5 today. Call 208-555-0142 later'), [
+    'A high of 52.5 today.',
+    'Call 208-555-0142 later',
+  ]);
+});
+
+test('each narration sentence passes through forEar', () => {
+  const rows = [{ section: 'spoken', ord: 0, text: 'Coffee & toast — then 2 – 3 PM is free. It will be 40° with 10% rain.' }];
+  assert.deepEqual(buildScript(rows, morning), [
+    'Coffee and toast, then 2 to 3 PM is free.',
+    'It will be 40 degrees with 10 percent rain.',
+  ]);
+});
+
+test('spoken rows with blank text fall back to the composed script', () => {
+  const rows = [
+    { section: 'spoken', ord: 0, text: '   ' },
+    { section: 'spoken', ord: 1 },
+    { section: 'todo', ord: 0, title: 'Water the plants' },
+  ];
+  assert.deepEqual(buildScript(rows, morning), [
+    "Good morning. It's Tuesday, March 3.",
+    'You have 1 to-do.',
+    'Water the plants.',
+    'Nothing on the calendar today.',
+    "That's the brief. The details are on screen.",
+  ]);
+});
+
+test('a stale brief is not read, even with a narration', () => {
+  const rows = [
+    { section: 'meta', ord: 0, date: '2026-03-02' },
+    { section: 'spoken', ord: 0, text: "Good morning. It's Monday." },
+  ];
+  assert.deepEqual(buildScript(rows, morning), [
+    "Good morning. It's Tuesday, March 3.",
+    "Today's brief has not arrived, so there is nothing new to read.",
+  ]);
 });

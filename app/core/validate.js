@@ -1,11 +1,12 @@
 import { text } from './brief.js';
 import { isStale } from './source.js';
 
-export const SECTIONS = ['meta', 'todo', 'cal', 'wx', 'wx_note', 'news', 'ai', 'email', 'tip'];
+export const SECTIONS = ['meta', 'todo', 'cal', 'wx', 'wx_note', 'news', 'ai', 'email', 'tip', 'spoken'];
 
 const TITLED = ['todo', 'cal', 'news', 'ai', 'email', 'tip'];
 const MAX_NEWS = 3;
 const MAX_TITLE = 140;
+const MAX_SPOKEN_WORDS = 450;
 const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 function label(row) {
@@ -84,6 +85,7 @@ export function validateBrief(json, now) {
         }
       }
     }
+    if (row.section === 'spoken' && !text(row.text)) errors.push(`${name}: text is empty.`);
     if (row.section === 'news') {
       const id = text(row.id);
       if (!id) {
@@ -105,6 +107,15 @@ export function validateBrief(json, now) {
   if (!rows.some((r) => r.section === 'wx')) warnings.push('There are no wx rows, so no weather is read.');
   if (!rows.some((r) => r.section === 'cal' && /^today\b/i.test(text(r.day)))) {
     warnings.push('No cal row has a day starting with "Today".');
+  }
+  const spoken = rows.filter((r) => r.section === 'spoken');
+  if (!spoken.length) {
+    warnings.push('There are no spoken rows, so the app reads its own plainer script.');
+  } else {
+    const words = spoken.reduce((sum, r) => sum + text(r.text).split(/\s+/).filter(Boolean).length, 0);
+    if (words > MAX_SPOKEN_WORDS) {
+      warnings.push(`The spoken rows hold ${words} words; keep the narration to ${MAX_SPOKEN_WORDS}.`);
+    }
   }
 
   return { ok: errors.length === 0, errors, warnings };

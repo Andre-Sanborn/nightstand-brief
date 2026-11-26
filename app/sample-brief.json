@@ -16,6 +16,12 @@
     { "section": "news", "ord": 2, "id": "sample-cave-survey", "topic": "Outdoors, caving and Idaho", "title": "Volunteers finish a sample cave survey", "detail": "This is an invented story that stands in for the third news item.", "source": "Sample Wire" },
     { "section": "ai", "ord": 0, "tag": "New", "title": "A sample release note", "detail": "An invented product update, shown on screen only." },
     { "section": "email", "ord": 0, "title": "Jordan asked about the packing list", "detail": "An invented message, shown on screen only." },
-    { "section": "tip", "ord": 0, "tag": "iPad", "title": "Swipe down from the top right", "detail": "Opens Control Centre, where the brightness slider is." }
+    { "section": "tip", "ord": 0, "tag": "iPad", "title": "Swipe down from the top right", "detail": "Opens Control Centre, where the brightness slider is." },
+    { "section": "spoken", "ord": 0, "text": "Good morning. It's Tuesday, the third of March, and the house is still quiet. Take your time waking." },
+    { "section": "spoken", "ord": 1, "text": "There's one thing to do today. The library books are due back at the Maple Street branch before it closes. And by Friday, Jordan is waiting on that packing list." },
+    { "section": "spoken", "ord": 2, "text": "The dentist expects you at two this afternoon. Then, at half past six, dinner with Sam and Priya." },
+    { "section": "spoken", "ord": 3, "text": "Outside, it will be partly sunny and cool, with a high of fifty-two. The rain waits until tomorrow." },
+    { "section": "spoken", "ord": 4, "text": "In the news, a sample chip maker has opened a new plant. A sample central bank is holding its rates steady. And volunteers have finished surveying a sample cave." },
+    { "section": "spoken", "ord": 5, "text": "That's all for now. Breathe slowly, and rise when you're ready." }
   ]
 }

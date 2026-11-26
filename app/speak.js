@@ -12,6 +12,29 @@ export function canSpeak() {
   return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 }
 
+// The list fills in after page load on iPadOS, so wait for voiceschanged when it is empty.
+export function loadVoices(timeoutMs = 3000) {
+  if (!canSpeak()) return Promise.resolve([]);
+  const synth = window.speechSynthesis;
+  const read = () => synth.getVoices().map((v) => ({ name: v.name, lang: v.lang, localService: v.localService }));
+  const now = read();
+  if (now.length) return Promise.resolve(now);
+  return new Promise((resolve) => {
+    const done = () => {
+      clearTimeout(timer);
+      synth.removeEventListener('voiceschanged', done);
+      resolve(read());
+    };
+    const timer = setTimeout(done, timeoutMs);
+    synth.addEventListener('voiceschanged', done);
+  });
+}
+
+function findVoice(name) {
+  if (!name) return null;
+  return window.speechSynthesis.getVoices().find((v) => v.name === name) || null;
+}
+
 export function stopSpeaking() {
   run += 1;
   clearWatchdog();
@@ -19,7 +42,8 @@ export function stopSpeaking() {
 }
 
 // The first utterance is queued synchronously, so call this from inside a tap handler.
-export function speak(lines, { onLine = () => {}, onDone = () => {}, onEvent = () => {} } = {}) {
+// A voice name not on this device falls back to the default voice.
+export function speak(lines, { voice = null, onLine = () => {}, onDone = () => {}, onEvent = () => {} } = {}) {
   run += 1;
   clearWatchdog();
   if (!canSpeak()) { onEvent('speech not available'); onDone(); return; }
@@ -29,6 +53,7 @@ export function speak(lines, { onLine = () => {}, onDone = () => {}, onEvent = (
   const busy = synth.speaking || synth.pending;
   if (busy) synth.cancel();
   const mine = run;
+  const chosen = findVoice(voice);
   let index = 0;
 
   const next = () => {
@@ -48,6 +73,10 @@ export function speak(lines, { onLine = () => {}, onDone = () => {}, onEvent = (
     };
     const utterance = new SpeechSynthesisUtterance(line);
     utterance.rate = 0.95;
+    if (chosen) {
+      utterance.voice = chosen;
+      utterance.lang = chosen.lang;
+    }
     utterance.onend = () => advance('');
     utterance.onerror = (e) => advance(`error ${e.error || ''}`.trim());
     onLine(at, line);

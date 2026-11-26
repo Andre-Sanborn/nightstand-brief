@@ -109,10 +109,25 @@ report in a few lines.
    "You need to send the form by noon", never "The form goes out at noon".
 5. Write everything for the ear, as the contract's "Writing for the ear" section
    says.
-6. Check the file with the command in the contract's checker section, run from
+6. Write the narration as `spoken` rows, last, from the rows already written.
+   The contract's `spoken` section is the full rule; in short:
+   - 250 to 350 words, in short paragraphs, one `spoken` row each.
+   - In this order: a warm greeting naming the day, what needs doing today,
+     today's calendar, the weather, the three news items, a gentle close.
+   - Narrate exactly the three `news` rows and the to-dos already chosen, with
+     today's calendar and weather. Add no new fact.
+   - Write for the ear: no symbols, URLs, abbreviations or lists. Say times
+     naturally, such as "half past nine" or "a quarter to two".
+   - The voice is warm, calm and wise, like a kind storyteller waking someone
+     gently. Speak to the reader as "you". Never imitate a named character or
+     a real person, and write no archaic pastiche.
+   - Every rule for spoken text above still applies. The narration is heard in
+     a room, so a security alert is only "a security alert in your email",
+     with no service or account named.
+7. Check the file with the command in the contract's checker section, run from
    a clone of this repository. Fix every error and every warning you can. A file
    with an error is never written.
-7. Write the file as `brief.json` at the root of the default branch of the
+8. Write the file as `brief.json` at the root of the default branch of the
    private repository, replacing the previous one, with the commit message
    "Brief for YYYY-MM-DD". Write it with git from a clone of that repository:
    commit under the identity the environment configures and
@@ -121,7 +136,7 @@ report in a few lines.
    clone, or the push is refused for permission or sign-in; that tool writes
    the commit under the owner's own name and email. Say in the report which
    way the file was written.
-8. Read the file back from the repository and confirm its `meta.date`.
+9. Read the file back from the repository and confirm its `meta.date`.
 
 ## When something fails
 
