@@ -1,5 +1,5 @@
 import { text } from './brief.js';
-import { isStale } from './source.js';
+import { isStale, audioName } from './source.js';
 
 export const SECTIONS = ['meta', 'todo', 'cal', 'wx', 'wx_note', 'news', 'ai', 'email', 'tip', 'spoken'];
 
@@ -65,6 +65,9 @@ export function validateBrief(json, now) {
       errors.push(`${label(meta)}: date "${date}" is not a real date written as YYYY-MM-DD.`);
     } else if (isStale(meta, now)) {
       warnings.push(`${label(meta)}: date ${date} is not today's local date, so the app will not read it aloud.`);
+    }
+    if (meta.audio !== undefined && !audioName(meta)) {
+      errors.push(`${label(meta)}: audio "${text(meta.audio)}" is not a file name such as "brief-2026-03-03-1a2b3c4d.mp3".`);
     }
   }
 

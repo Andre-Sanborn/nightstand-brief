@@ -50,6 +50,7 @@ ignored.
 | `greeting` | No | A sentence written for the ear, such as "Good morning. It's a cold one." Read aloud first. Without it the app says "Good morning. It's Tuesday, March 3." |
 | `day` | No | The date as shown, such as "Tuesday · March 3 2026". Shown. |
 | `time` | No | When the brief was made, such as "Ready 5:30 AM". Shown. |
+| `audio` | No | The file name of a recording of the narration, such as `brief-2026-03-03-3fa9c1d2.mp3`. See "The recording" below. Without it the app speaks with the iPad's built-in voice. |
 
 ### `todo`: things to do
 
@@ -155,6 +156,26 @@ Write the narration as follows.
   security alert is only "a security alert in your email", with no service or
   account named.
 
+## The recording
+
+A separate daily task can turn the narration into an MP3 file. The app then
+plays that file instead of speaking with the iPad's built-in voice.
+
+- The file sits beside `brief.json` at the root of the same private
+  repository. It is never written to this repository.
+- Its name uses only letters, digits, dots and hyphens, starts with a letter or
+  digit, ends in `.mp3` (lower case), and has no slash. Put the date and a
+  short unique part in it, such as `brief-2026-03-03-3fa9c1d2.mp3`, so a new
+  recording never has the name of an old one.
+- Write `meta.audio` only in the same commit that adds the file. The app
+  fetches exactly the file the brief names, so a brief that names a file not
+  yet committed falls back to built-in speech.
+- Leave `meta.audio` out when no recording was made. Never point it at an older
+  day's file.
+- The recording says what the `spoken` rows say. The app plays it only when the
+  brief is today's, the owner has the "Recorded voice" setting on, and the file
+  arrived and decoded before the tap.
+
 ## What the checker enforces
 
 `validateBrief(json, now)` in `app/core/validate.js` returns
@@ -168,6 +189,8 @@ Errors:
 - A row is not an object, or its `section` is not one of the ten above.
 - There is no `meta` row, or more than one.
 - `meta.date` is missing, is not `YYYY-MM-DD`, or is not a real date.
+- `meta.audio` is present but is not a file name as described under "The
+  recording".
 - A `todo`, `cal`, `news`, `ai`, `email` or `tip` row has an empty `title`.
 - A `news` row has no `id`, or reuses another news row's `id`.
 - A `wx` row has `hi`, `lo` or `pop` that is present but not a number. A

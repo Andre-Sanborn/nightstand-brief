@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseSource, briefRequest, isStale } from '../app/core/source.js';
+import { parseSource, briefRequest, isStale, audioName, audioRequest } from '../app/core/source.js';
 
 test('parseSource needs an owner/name repository and a token', () => {
   assert.deepEqual(parseSource({ repo: ' octo/briefs ', token: ' abc123 ' }), { repo: 'octo/briefs', token: 'abc123' });
@@ -21,6 +21,47 @@ test('briefRequest asks the GitHub contents API for the raw file', () => {
       'X-GitHub-Api-Version': '2022-11-28',
     },
   });
+});
+
+test('audioName accepts letters, digits, dots and hyphens ending in .mp3', () => {
+  assert.equal(audioName({ audio: 'brief-2026-11-26-3fa9c1d2.mp3' }), 'brief-2026-11-26-3fa9c1d2.mp3');
+  assert.equal(audioName({ audio: 'A.b-9.mp3' }), 'A.b-9.mp3');
+  assert.equal(audioName({ audio: '7.mp3' }), '7.mp3');
+});
+
+test('audioName returns null for anything else', () => {
+  for (const audio of [
+    undefined, null, '', 42, ['a.mp3'],
+    '.mp3', '.hidden.mp3', '-x.mp3', // no leading letter or digit
+    'brief.MP3', 'brief.wav', 'brief.mp3.txt', 'brief', // wrong ending
+    'audio/brief.mp3', '../brief.mp3', 'a\\b.mp3', // a path
+    'brief 1.mp3', 'brief_1.mp3', 'brief%2F.mp3', 'brief?.mp3', 'brïef.mp3', ' brief.mp3',
+  ]) {
+    assert.equal(audioName({ audio }), null, String(audio));
+  }
+  assert.equal(audioName({}), null);
+  assert.equal(audioName(null), null);
+});
+
+test('audioRequest asks the brief repository for the raw recording', () => {
+  assert.deepEqual(audioRequest({ repo: 'octo/briefs', token: 'abc123' }, 'brief-2026-11-26-3fa9c1d2.mp3'), {
+    url: 'https://api.github.com/repos/octo/briefs/contents/brief-2026-11-26-3fa9c1d2.mp3',
+    headers: {
+      Accept: 'application/vnd.github.raw+json',
+      Authorization: 'Bearer abc123',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+});
+
+test('audioRequest for the sample brief is a relative path with no token', () => {
+  assert.deepEqual(audioRequest(null, 'sample-tone.mp3'), { url: 'sample-tone.mp3', headers: {} });
+});
+
+test('audioRequest refuses a name that is not a plain .mp3 file name', () => {
+  assert.equal(audioRequest({ repo: 'octo/briefs', token: 'abc123' }, '../secrets.mp3'), null);
+  assert.equal(audioRequest(null, 'https://example.com/a.mp3'), null);
+  assert.equal(audioRequest(null, undefined), null);
 });
 
 test('a brief dated another day is stale; an undated brief is not', () => {

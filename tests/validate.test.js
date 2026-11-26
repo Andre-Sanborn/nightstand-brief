@@ -229,3 +229,24 @@ test('warning: a narration over 450 words in total', () => {
   ]);
   assert.deepEqual(validateBrief(brief(narration(300, 150)), morning).warnings, []);
 });
+
+test('meta.audio: a plain .mp3 file name passes, and leaving it out passes', () => {
+  const named = brief((rows) => replace(rows, 'meta', 0, { audio: 'brief-2026-03-03-3fa9c1d2.mp3' }));
+  assert.deepEqual(validateBrief(named, morning), { ok: true, errors: [], warnings: [] });
+});
+
+test('error: meta.audio that is not a plain .mp3 file name', () => {
+  const cases = [
+    ['audio/brief.mp3', 'audio "audio/brief.mp3"'],
+    ['brief.wav', 'audio "brief.wav"'],
+    ['brief 1.mp3', 'audio "brief 1.mp3"'],
+    ['.mp3', 'audio ".mp3"'],
+    ['', 'audio ""'],
+    [null, 'audio ""'],
+    [7, 'audio "7"'],
+  ];
+  for (const [audio, quoted] of cases) {
+    const result = validateBrief(brief((rows) => replace(rows, 'meta', 0, { audio })), morning);
+    assert.deepEqual(result.errors, [`meta ord 0: ${quoted} is not a file name such as "brief-2026-03-03-1a2b3c4d.mp3".`], String(audio));
+  }
+});

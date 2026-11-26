@@ -9,6 +9,8 @@ let chimeTimer = null;
 let chimeGeneration = 0;
 let chimeVoice = null;
 let lastChime = -1;
+let ringVoices = [];
+let recording = null;
 let report = () => {};
 
 const RAMP_SECONDS = 30;
@@ -83,7 +85,7 @@ function note(freq, at, length, level, attack = 0.02, type = 'triangle') {
   osc.connect(gain).connect(ctx.destination);
   osc.start(at);
   osc.stop(at + length + 0.05);
-  return { osc, gain };
+  return { osc, gain, at };
 }
 
 export function chime() {
@@ -97,6 +99,7 @@ export function chime() {
 export async function startRing() {
   if (!ctx) return 'none';
   stopRing();
+  stopRecording();
   const mine = ringGeneration;
   await recover();
   if (mine !== ringGeneration) return 'stopped';
@@ -105,20 +108,24 @@ export async function startRing() {
     if (ctx.state !== 'running') { recover(); return; }
     const level = Math.min(1, 0.06 + ((ctx.currentTime - ringStartedAt) / RAMP_SECONDS) * 0.94);
     const t = ctx.currentTime + 0.03;
-    note(880, t, 0.22, level);
-    note(880, t + 0.28, 0.22, level);
-    note(1175, t + 0.56, 0.3, level);
+    ringVoices = ringVoices.filter((v) => v.end > ctx.currentTime);
+    for (const [freq, at, length] of [[880, t, 0.22], [880, t + 0.28, 0.22], [1175, t + 0.56, 0.3]]) {
+      ringVoices.push({ ...note(freq, at, length, level), end: at + length + 0.05 });
+    }
   };
   bar();
   ringTimer = setInterval(bar, 1400);
   return ctx.state;
 }
 
+// Silences notes already scheduled, so the last bar does not sound under the greeting.
 export function stopRing() {
   stopChimes();
   ringGeneration += 1;
   if (ringTimer) clearInterval(ringTimer);
   ringTimer = null;
+  for (const voice of ringVoices) fade(voice);
+  ringVoices = [];
 }
 
 // One note per timer step, never a batch ahead, so a stop leaves nothing queued to sound later.
@@ -146,13 +153,49 @@ export function stopChimes() {
   chimeGeneration += 1;
   if (chimeTimer) clearTimeout(chimeTimer);
   chimeTimer = null;
-  if (chimeVoice && ctx) {
-    const t = ctx.currentTime;
-    const { osc, gain } = chimeVoice;
-    gain.gain.cancelScheduledValues(t);
-    gain.gain.setValueAtTime(gain.gain.value, t);
-    gain.gain.linearRampToValueAtTime(0, t + 0.1);
-    try { osc.stop(t + 0.12); } catch { /* already stopped */ }
-  }
+  if (chimeVoice) fade(chimeVoice);
   chimeVoice = null;
+}
+
+// A note that has not started is held at zero: cancelling its envelope leaves the default gain of 1.
+function fade({ osc, gain, at }) {
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  gain.gain.cancelScheduledValues(t);
+  gain.gain.setValueAtTime(at > t ? 0 : gain.gain.value, t);
+  gain.gain.linearRampToValueAtTime(0, t + 0.1);
+  try { osc.stop(t + 0.12); } catch { /* already stopped */ }
+}
+
+// Needs a context, but not a running one, so it can run in the background after any tap.
+export async function decodeRecording(bytes) {
+  if (!ctx) throw new Error('no audio engine');
+  return ctx.decodeAudioData(bytes);
+}
+
+// Must be called from a tap when the context may be suspended: resume() needs the gesture.
+// Returns false with no engine. onEnded runs only when the buffer plays to its end.
+export function playRecording(buffer, onEnded) {
+  if (!ctx) return false;
+  stopRecording();
+  if (ctx.state !== 'running') recover();
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(ctx.destination);
+  source.onended = () => {
+    if (recording !== source) return;
+    recording = null;
+    onEnded();
+  };
+  recording = source;
+  source.start();
+  return true;
+}
+
+export function stopRecording() {
+  if (!recording) return;
+  const source = recording;
+  recording = null;
+  source.onended = null;
+  try { source.stop(); } catch { /* never started */ }
 }

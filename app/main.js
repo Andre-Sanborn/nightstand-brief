@@ -2,9 +2,12 @@ import { parseTime, nextAlarm, isDue, minutesLate, refreshEvery, formatClock } f
 import { rowsOf, section, text, number } from './core/brief.js';
 import { buildScript } from './core/speech.js';
 import { applyVote, voteFor } from './core/votes.js';
-import { parseSource, briefRequest, isStale } from './core/source.js';
+import { parseSource, briefRequest, isStale, audioName, audioRequest } from './core/source.js';
 import { softWakeMinutes, softStart, wakePhase, softProgress, dawnRgb, dawnColour, inkFor, chimeGain } from './core/softwake.js';
-import { startEngine, engineState, chime, startRing, stopRing, startChimes, stopChimes } from './audio.js';
+import {
+  startEngine, engineState, chime, startRing, stopRing, startChimes, stopChimes,
+  decodeRecording, playRecording, stopRecording,
+} from './audio.js';
 import { speak, stopSpeaking, loadVoices } from './speak.js';
 
 const $ = (id) => document.getElementById(id);
@@ -25,6 +28,7 @@ const IM_UP_WINDOW_MS = 5000;
 let imUpAt = 0;
 const TRY_LINE = 'Good morning. The kettle is on, and the day can wait a moment.';
 const VOTE_LABELS = [['up', 'More like this'], ['down', 'Less like this'], ['never', 'Nothing like this']];
+const RECORDING_LABEL = 'Playing the recorded voice';
 
 // Storage can throw in private windows; the clock must still run without it.
 const store = {
@@ -127,8 +131,11 @@ async function holdWakeLock() {
   }
 }
 
-function startAudio() {
-  return startEngine((event) => log(event, event !== 'audio running'));
+// A recording fetched before the engine existed is decoded once the engine starts.
+async function startAudio() {
+  const state = await startEngine((event) => log(event, event !== 'audio running'));
+  prepareRecording();
+  return state;
 }
 
 function closeConfirm() {
@@ -219,7 +226,7 @@ function greetFromSoftWake() {
   drawBrief();
   show('brief');
   $('brief').scrollTop = 0;
-  readBrief();
+  startReading('soft wake tap');
   // A reloaded page has no audio engine; this tap is the only chance to start one before the ring.
   if (engineState() === 'none') startAudio();
 }
@@ -228,7 +235,6 @@ function alarmReached(ms) {
   // The alarm never infers that the owner is up: a sleepy tap on the light must not cancel it.
   if (softTapAt !== null) {
     log('alarm rings after a soft-wake tap');
-    quietReading();
   } else if (softBegun) {
     log('alarm rings: soft wake was not tapped');
   }
@@ -237,6 +243,8 @@ function alarmReached(ms) {
 
 async function ring(late) {
   ringing = true;
+  // Nothing is read over the tone, however the reading began.
+  if (reading) stopReading();
   endSoftWake();
   closeConfirm();
   $('rearm').hidden = true;
@@ -252,29 +260,58 @@ async function ring(late) {
   log(state === 'running' ? 'alarm tone started' : `alarm tone not playing, audio ${state}`, state !== 'running');
 }
 
-function quietReading() {
-  stopSpeaking();
+function showIdle() {
   reading = false;
   $('read').hidden = false;
   $('hush').hidden = true;
   $('now-reading').textContent = '';
 }
 
-function readBrief() {
+// Every way of stopping a reading comes here, whichever voice is playing.
+function stopReading() {
+  stopSpeaking();
+  stopRecording();
+  showIdle();
+}
+
+function finishReading() {
+  showIdle();
+  log('brief read to the end');
+}
+
+// Says why a reading falls back to built-in speech, or returns '' when the recording can play.
+function whyNotRecording(now) {
+  const meta = briefMeta();
+  if (!audioName(meta)) return 'the brief names no recording';
+  if (!store.get('recorded', true)) return 'recorded voice is off';
+  if (isStale(meta, now)) return 'the brief is not today\'s';
+  if (!recording || recording.key !== recordingKey()) return 'the recording is not ready';
+  if (engineState() === 'none') return 'no audio engine';
+  return '';
+}
+
+// Every way of starting a reading comes here. It must not wait on a promise, because
+// iPadOS starts sound only inside the tap that called it.
+function startReading(origin) {
   $('read').hidden = true;
   $('hush').hidden = false;
   reading = true;
-  speak(buildScript(rows, new Date()), {
+  const now = new Date();
+  const why = whyNotRecording(now);
+  if (!why) {
+    stopSpeaking();
+    playRecording(recording.buffer, finishReading);
+    $('now-reading').textContent = RECORDING_LABEL;
+    log(`${origin}: reading with the recorded voice`);
+    return;
+  }
+  stopRecording();
+  log(`${origin}: reading with built-in speech, because ${why}`);
+  speak(buildScript(rows, now), {
     voice: chosenVoice(),
     onLine: (i, line) => { $('now-reading').textContent = line; },
     onEvent: (event) => log(event, true),
-    onDone: () => {
-      reading = false;
-      $('now-reading').textContent = '';
-      $('read').hidden = false;
-      $('hush').hidden = true;
-      log('brief read to the end');
-    },
+    onDone: finishReading,
   });
 }
 
@@ -288,7 +325,7 @@ function stopAlarmAndGreet() {
   drawBrief();
   show('brief');
   $('brief').scrollTop = 0;
-  readBrief();
+  startReading('stop tap');
 }
 
 function item(row, withVotes) {
@@ -449,6 +486,8 @@ async function loadBrief() {
     rows = fetched;
     if (loadFailed !== false) log('brief loaded');
     loadFailed = false;
+    // Not awaited: the recording arrives in the background and is never fetched inside a tap.
+    prepareRecording();
   } catch (err) {
     if (mine !== loadSeq) return briefNotice;
     briefNotice = `The brief did not load: ${err.message}.`;
@@ -458,6 +497,67 @@ async function loadBrief() {
   drawWeather();
   drawBrief();
   return briefNotice;
+}
+
+function briefMeta() {
+  return section(rows, 'meta')[0] || {};
+}
+
+// One decoded recording at most, for the brief on screen: { key, buffer }.
+let recording = null;
+// The key being fetched or decoded, so a refresh does not start a second copy.
+let recordingWanted = null;
+// Bytes fetched before any tap started the engine: { key, bytes }.
+let recordingBytes = null;
+// Logged once per recording, so a night of retries does not fill the log.
+let recordingFailed = null;
+
+// The source is part of the key, so switching repositories never plays the other one's file.
+function recordingKey() {
+  const meta = briefMeta();
+  const name = audioName(meta);
+  if (!name) return null;
+  const source = parseSource(store.get('source', null));
+  return `${source ? source.repo : 'sample'}|${text(meta.date)}|${name}`;
+}
+
+async function fetchRecording(name) {
+  const request = audioRequest(parseSource(store.get('source', null)), name);
+  const response = await fetch(request.url, { headers: request.headers, cache: 'no-store' });
+  if (!response.ok) throw new Error(`the server answered ${response.status}`);
+  return response.arrayBuffer();
+}
+
+async function prepareRecording() {
+  const key = recordingKey();
+  if (recording && recording.key !== key) recording = null;
+  if (recordingBytes && recordingBytes.key !== key) recordingBytes = null;
+  if (!key || !store.get('recorded', true) || isStale(briefMeta(), new Date())) return;
+  if ((recording && recording.key === key) || recordingWanted === key) return;
+  recordingWanted = key;
+  try {
+    let bytes = recordingBytes ? recordingBytes.bytes : null;
+    if (!bytes) bytes = await fetchRecording(audioName(briefMeta()));
+    if (key !== recordingKey()) return;
+    if (engineState() === 'none') {
+      if (!recordingBytes) log('audio fetched; it is decoded after the next tap starts the sound');
+      recordingBytes = { key, bytes };
+      return;
+    }
+    recordingBytes = null;
+    const buffer = await decodeRecording(bytes);
+    if (key !== recordingKey()) return;
+    recording = { key, buffer };
+    recordingFailed = null;
+    log(`audio fetched and decoded, ${buffer.duration.toFixed(1)} seconds`);
+  } catch (err) {
+    if (recordingFailed !== key) {
+      log(`audio fetch or decode failed: ${err.message || err.name || err}; reading falls back to speech`, true);
+    }
+    recordingFailed = key;
+  } finally {
+    if (recordingWanted === key) recordingWanted = null;
+  }
 }
 
 function chosenVoice() {
@@ -495,6 +595,12 @@ function showControls(open) {
 
 $('face').addEventListener('click', () => showControls($('controls').hidden));
 $('voice').addEventListener('change', () => store.set('voice', $('voice').value));
+$('recorded').checked = store.get('recorded', true);
+$('recorded').addEventListener('change', () => {
+  store.set('recorded', $('recorded').checked);
+  log(`recorded voice turned ${$('recorded').checked ? 'on' : 'off'}`);
+  prepareRecording();
+});
 // Speech has to start inside this tap.
 $('try-voice').addEventListener('click', () => {
   speak([TRY_LINE], { voice: chosenVoice(), onEvent: (event) => log(event, true) });
@@ -563,11 +669,15 @@ $('source-sample').addEventListener('click', async () => {
 });
 $('source-close').addEventListener('click', () => { $('source').hidden = true; });
 $('open-log').addEventListener('click', () => { drawLog(); show('log'); });
-$('back').addEventListener('click', () => { quietReading(); show('clock'); });
+$('back').addEventListener('click', () => { stopReading(); show('clock'); });
 $('log-back').addEventListener('click', () => show('clock'));
 $('log-clear').addEventListener('click', () => { store.set('log', []); drawLog(); });
-$('read').addEventListener('click', readBrief);
-$('hush').addEventListener('click', quietReading);
+$('read').addEventListener('click', () => {
+  startReading('read aloud');
+  // Without an engine no recording can be decoded; this tap starts one for the next reading.
+  if (engineState() === 'none') startAudio();
+});
+$('hush').addEventListener('click', stopReading);
 // Two taps, because a sleepy tap must not cancel the alarm. A second tap sooner than
 // IM_UP_MIN_GAP_MS is a double-tap or a finger bounce and does not count.
 function resetImUp() {

@@ -16,7 +16,11 @@
 - [x] Keep buttons inside the screen edges and safe areas at iPad sizes
 - [ ] Device check: controls and brief bar not clipped in the Home Screen app
 - [ ] Fall back to the default voice when the chosen voice fails
-- [ ] Owner: decide on a paid voice service for a natural voice
+- [x] Owner: decide on a paid voice service for a natural voice
+- [x] Play the narration from a recorded MP3 named in `meta.audio`, falling back to speech
+- [ ] Owner: create the text-to-speech account, add credit, and enter the key in the secure form
+- [ ] Build the daily step that records the narration and commits the MP3 with `meta.audio`
+- [ ] Device check: recorded voice in Silent mode, after a ring, at the soft-wake tap, Stop reading
 - [ ] Device test 1: one-minute alarm on the iPad, soft wake, tone and speech all work
 - [ ] Device test 2: arm overnight, read the night log in the morning
 - [ ] Device test 3: tap during the soft wake; the alarm should still ring at the alarm time
