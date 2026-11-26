@@ -244,7 +244,8 @@ function alarmReached(ms) {
 async function ring(late) {
   ringing = true;
   // Nothing is read over the tone, however the reading began.
-  if (reading) stopReading();
+  // A failure to stop a reading must not keep the tone from starting.
+  try { if (reading) stopReading(); } catch (e) { log(`reading not stopped: ${e.message}`, true); }
   endSoftWake();
   closeConfirm();
   $('rearm').hidden = true;

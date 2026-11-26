@@ -360,6 +360,13 @@ reading, recorded or spoken.
 Untested on the iPad: decoding MP3 on a suspended context, playback in Silent
 mode, and memory for a recording of about two and a half minutes.
 
+The decoded recording is uncompressed, about 11 MB for each mono minute at 48
+kHz, and a decode can start at ring time when the brief changed overnight.
+`fade()` reads `AudioParam.value` to start its ramp, which is untested on
+WebKit. A browser check that measures the real output level found the alarm
+rings and stops in every case tried, including a recording fetch that hangs or
+fails to decode.
+
 ## Layout at iPad sizes
 
 The owner reported buttons clipped at the top and bottom in the Home Screen
