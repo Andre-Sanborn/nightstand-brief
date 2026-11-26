@@ -361,13 +361,16 @@ reading, recorded or spoken.
 
 - **The key** is saved as a network secret on the `nightstand-brief` cloud
   environment, entered by the owner in a secure form. The proxy adds it to
-  requests to the service's host. It is never in a repository, a prompt, an
-  environment variable or a log.
-- **The host** is allowed by saving that secret. Requests go through `curl`,
+  requests to the service's host, as the credential tool describes; untested
+  here. It is never in a repository, a prompt, an environment variable or a
+  log.
+- **The host** is allowed by saving that secret, by the same description;
+  untested here. Requests go through `curl`,
   because Node's fetch does not use the proxy.
 - **The file** is mono MP3 at 48 kbps or lower, about 0.7 MB a day. Mono also
   halves the decoded buffer. The private repository's history will need
-  squashing about once a year to stay small.
+  squashing about once a year to stay small. That rewrites history, so it
+  needs the owner's word each time.
 - **Failure** never delays the brief. The step runs after the checker passes,
   with a time limit. An empty file, or one far from the expected length, is
   rejected. On any failure the brief is committed without `meta.audio` and the

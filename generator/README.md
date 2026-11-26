@@ -158,7 +158,7 @@ Write the narration as follows.
 
 ## The recording
 
-A separate daily task can turn the narration into an MP3 file. The app then
+A later step of the daily task can turn the narration into an MP3 file. The app then
 plays that file instead of speaking with the iPad's built-in voice.
 
 - The file sits beside `brief.json` at the root of the same private

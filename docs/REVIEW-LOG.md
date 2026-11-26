@@ -1,8 +1,21 @@
 # Review log
 
-Last reviewed commit: d05b7f3
+Last reviewed commit: e61ff6d
 
 Newest entry first.
+
+## 2026-11-26, project check, commit e61ff6d
+
+Reviewer: strategy-adversary.
+
+- The contract called the recording a separate task while the plan makes it a
+  step of the daily run. Fixed: the contract says a later step of the daily
+  task.
+- Squashing the private repository's history rewrites history. Recorded: it
+  needs the owner's word each time.
+- Two claims about the network secret were stated as fact. Marked as described
+  by the credential tool and untested here.
+- The new narration rule and privacy: nothing found.
 
 ## 2026-11-26, project check, commit d05b7f3
 
