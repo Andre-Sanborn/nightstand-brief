@@ -1,8 +1,25 @@
 # Review log
 
-Last reviewed commit: c696037
+Last reviewed commit: d05b7f3
 
 Newest entry first.
+
+## 2026-11-26, project check, commit d05b7f3
+
+Reviewer: strategy-adversary.
+
+- The recording step had five open decisions: where the key lives, the host,
+  the file format, what happens when synthesis fails, and the pin. Decided and
+  recorded in IMPLEMENTATION.md before building.
+- The device tests are still the critical path. None has passed overnight.
+- Design faults in the playback change: nothing that harms the alarm. Mono is
+  required so the decoded size stays as estimated.
+- The first real narration kept every rule but one: a to-do was given a time of
+  day that no row states. Fixed: the task gives a to-do a time only when its
+  title states one.
+- Claims, ticked items and privacy: nothing found.
+
+The daily run's pin moves to the commit that carries the narration fix.
 
 ## 2026-11-25, review of the narration rules, commit c696037
 

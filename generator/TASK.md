@@ -116,7 +116,8 @@ report in a few lines.
      when, today's calendar, the weather, the three news items, a gentle close.
    - Narrate exactly the three `news` rows and the to-dos already chosen, each
      to-do with its own day, with today's calendar and today's weather. One
-     phrase about tomorrow's weather is allowed. Add no new fact.
+     phrase about tomorrow's weather is allowed. Add no new fact: give a
+     to-do a time of day only when its title states one.
    - Use only the fields the contract marks as read aloud: titles, times, and
      the weather numbers. Never a `detail`, a place, or a person from a row.
    - Write for the ear: no symbols, URLs, abbreviations or lists. Say times
