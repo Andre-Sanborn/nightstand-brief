@@ -140,8 +140,11 @@ The development branch is `claude/wonderful-feynman-7eq6yb`. Push with:
 git push -u origin claude/wonderful-feynman-7eq6yb
 ```
 
-- **`main` and pull requests need the human's word each time.** The app is
-  published from `main`, so a merge there changes what the iPad runs.
+- **`main` takes accepted work whenever the tests pass.** The human gave this
+  standing permission on 2026-11-25, while testing on the iPad. The app is
+  published from `main`, so a push there changes what the iPad runs. A pull
+  request, or a rewrite of `main`'s history, still needs the human's word each
+  time.
 - **Never merge through the GitHub API or website.** GitHub writes that merge
   commit under the human's own name and email, in public. Bring `main` up to
   date with a fast-forward `git push origin <branch>:main` from this clone, so
