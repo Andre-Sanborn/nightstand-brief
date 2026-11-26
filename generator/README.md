@@ -136,14 +136,18 @@ sentence breaks there.
 Write the narration as follows.
 
 - **Length**: 250 to 350 words in total, across about six to eight rows.
-- **Order**: a warm greeting that names the day; what needs doing today; today's
+- **Order**: a warm greeting that names the day; what needs doing and when; today's
   calendar; the weather; the three news items; a gentle close. One row per part
   is a good shape.
 - **Facts**: it narrates the three `news` rows and the `todo` rows already in the
-  brief, and today's `cal` and `wx` rows. It adds no new fact, story, task or
-  event.
+  brief, each to-do with its own day, and today's `cal` and `wx` rows. One
+  phrase about tomorrow's weather is allowed. It adds no new fact, story, task
+  or event.
+- **Fields**: it uses only what is marked as read aloud: titles, times and the
+  weather numbers. It never speaks a `detail`, a place or a person from a row.
 - **For the ear**: no symbols, URLs, abbreviations or lists. Say times the way
-  people say them: "half past nine", "a quarter to two", "noon".
+  people say them, with the part of the day: "half past nine this morning", "a
+  quarter to two this afternoon", "noon".
 - **Voice**: warm, calm and wise, like a kind storyteller waking someone gently.
   Speak to the reader as "you". Never imitate a named character or a real
   person. No archaic pastiche: no "thee", "hark" or "once upon a time".
@@ -288,9 +292,9 @@ one runs 250 to 350 words.
     { "section": "email", "ord": 0, "title": "A neighbor asked to borrow the ladder", "detail": "They need it Saturday." },
     { "section": "tip", "ord": 0, "tag": "iPad", "title": "Swipe down from the top right",
       "detail": "Opens Control Centre, where the brightness slider is." },
-    { "section": "spoken", "ord": 0, "text": "Good morning. It's Tuesday, the third of March, and there's no need to hurry." },
+    { "section": "spoken", "ord": 0, "text": "Good morning. It's Tuesday, the third of March." },
     { "section": "spoken", "ord": 1, "text": "Before the library closes today, the books want to go back." },
-    { "section": "spoken", "ord": 2, "text": "Your one appointment is the dentist, from two until a quarter to three." },
+    { "section": "spoken", "ord": 2, "text": "Your one appointment is the dentist, from two until a quarter to three this afternoon." },
     { "section": "spoken", "ord": 3, "text": "It will be partly sunny, with a high of fifty-two. Rain comes tomorrow." },
     { "section": "spoken", "ord": 4, "text": "In the news, a sample lab has released a smaller language model that runs on phones. A sample central bank held its rate steady. And volunteers have finished mapping a sample cave." },
     { "section": "spoken", "ord": 5, "text": "That's everything. Rise slowly, and go gently." }

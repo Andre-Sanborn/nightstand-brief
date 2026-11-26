@@ -112,12 +112,16 @@ report in a few lines.
 6. Write the narration as `spoken` rows, last, from the rows already written.
    The contract's `spoken` section is the full rule; in short:
    - 250 to 350 words, in short paragraphs, one `spoken` row each.
-   - In this order: a warm greeting naming the day, what needs doing today,
-     today's calendar, the weather, the three news items, a gentle close.
-   - Narrate exactly the three `news` rows and the to-dos already chosen, with
-     today's calendar and weather. Add no new fact.
+   - In this order: a warm greeting naming the day, what needs doing and
+     when, today's calendar, the weather, the three news items, a gentle close.
+   - Narrate exactly the three `news` rows and the to-dos already chosen, each
+     to-do with its own day, with today's calendar and today's weather. One
+     phrase about tomorrow's weather is allowed. Add no new fact.
+   - Use only the fields the contract marks as read aloud: titles, times, and
+     the weather numbers. Never a `detail`, a place, or a person from a row.
    - Write for the ear: no symbols, URLs, abbreviations or lists. Say times
-     naturally, such as "half past nine" or "a quarter to two".
+     naturally and say which part of the day, such as "half past nine this
+     morning" or "a quarter to two this afternoon".
    - The voice is warm, calm and wise, like a kind storyteller waking someone
      gently. Speak to the reader as "you". Never imitate a named character or
      a real person, and write no archaic pastiche.

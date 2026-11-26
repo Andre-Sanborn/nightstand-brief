@@ -1,8 +1,26 @@
 # Review log
 
-Last reviewed commit: 647a6af
+Last reviewed commit: c696037
 
 Newest entry first.
+
+## 2026-11-25, review of the narration rules, commit c696037
+
+Reviewer: strategy-adversary, on the generator files, the validator and the
+sentence splitter. The plan had its own review before it was built.
+
+- The narration could speak fields meant only to be shown. Fixed: it uses only
+  fields marked as read aloud, and never a detail, place or person.
+- The example mentioned tomorrow's rain and an invented reassurance against the
+  facts rule. Fixed: one phrase on tomorrow's weather is allowed, and the
+  reassurance is gone.
+- "What needs doing today" clashed with to-dos due later. Fixed: each to-do is
+  narrated with its own day.
+- Times lacked the part of the day. Fixed: the narration says morning,
+  afternoon or evening.
+- Sentence splitting and privacy of the changed text: nothing found.
+
+The daily run's pin moves to the commit that carries these fixes.
 
 ## 2026-11-24, two-hour project check, commit 647a6af
 
