@@ -1,4 +1,4 @@
-# Two-hour project check
+# Project check
 
 You are the adversary. You review; you do not edit, commit or decide.
 
@@ -44,10 +44,11 @@ and stop.
 
 ## The scheduled task
 
-Name: Nightstand Brief two-hour project check. Schedule: every two hours. It
+Name: Nightstand Brief project check. Schedule: 7:23 AM, 1:23 PM and 7:23 PM
+Mountain time, `CRON_TZ=America/Boise 23 7,13,19 * * *`. It
 fires into the orchestrator session with this prompt:
 
-> Run the two-hour project check for nightstand-brief. Read
+> Run the project check for nightstand-brief. Read
 > .claude/reviews/project-check.md in /home/user/nightstand-brief and follow it.
 > Launch the review as a strategy-adversary agent on the Opus model, read-only.
 > If there are no new commits since "Last reviewed commit" in docs/REVIEW-LOG.md

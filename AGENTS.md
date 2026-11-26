@@ -109,13 +109,14 @@ human's standing instruction, set 2026-11-17. Each file in `.claude/agents/` pin
 that id. Pass the Opus model when launching any agent, including ones with no
 project definition. Changing an agent's model is the human's call.
 
-### The two-hour project check
+### The project check
 
-Every two hours an adversary reviews the project. The human asked for this on
-2026-11-17. The brief is [`.claude/reviews/project-check.md`](.claude/reviews/project-check.md)
+Three times a day an adversary reviews the project: at about 7 AM, 1 PM and
+7 PM Mountain time. The human asked for a two-hour check on 2026-11-17 and
+slowed it to six hours, with a pause overnight, on 2026-11-25. The brief is [`.claude/reviews/project-check.md`](.claude/reviews/project-check.md)
 and the record is [`docs/REVIEW-LOG.md`](docs/REVIEW-LOG.md).
 
-The job is a scheduled task named "Nightstand Brief two-hour project check",
+The job is a scheduled task named "Nightstand Brief project check",
 created with the claude-code-remote `create_trigger` tool. It fires into the
 orchestrator session. At the start of every session, list the scheduled tasks
 with `list_triggers` and recreate it from the brief if it is missing or bound to
