@@ -1,6 +1,7 @@
 let run = 0;
 // Module-level so stopping one reading clears its timer before the next reading starts.
 let watchdog = null;
+const AFTER_CANCEL_MS = 250;
 
 function clearWatchdog() {
   clearTimeout(watchdog);
@@ -19,8 +20,14 @@ export function stopSpeaking() {
 
 // The first utterance is queued synchronously, so call this from inside a tap handler.
 export function speak(lines, { onLine = () => {}, onDone = () => {}, onEvent = () => {} } = {}) {
-  stopSpeaking();
+  run += 1;
+  clearWatchdog();
   if (!canSpeak()) { onEvent('speech not available'); onDone(); return; }
+  const synth = window.speechSynthesis;
+  // iPadOS drops an utterance queued in the same turn as cancel(), so cancel only
+  // when something is queued, and then start after a pause.
+  const busy = synth.speaking || synth.pending;
+  if (busy) synth.cancel();
   const mine = run;
   let index = 0;
 
@@ -47,10 +54,14 @@ export function speak(lines, { onLine = () => {}, onDone = () => {}, onEvent = (
     // Some iPadOS versions never fire onend; move on rather than stall the brief.
     // Set before speak(), in case onend fires synchronously and the next line starts first.
     watchdog = setTimeout(() => {
-      window.speechSynthesis.cancel();
-      advance('no end event');
+      if (finished || mine !== run) return;
+      finished = true;
+      clearWatchdog();
+      onEvent(`speech line ${at + 1}: no end event`);
+      synth.cancel();
+      setTimeout(next, AFTER_CANCEL_MS);
     }, 6000 + line.length * 110);
-    window.speechSynthesis.speak(utterance);
+    synth.speak(utterance);
   };
-  next();
+  if (busy) setTimeout(next, AFTER_CANCEL_MS); else next();
 }

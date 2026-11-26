@@ -293,6 +293,13 @@ search, unless mail shows it was resolved. It is spoken only in its first 48
 hours, because answering an alert on the provider's
 page usually sends no mail, and the room should not hear it all week.
 
+The first run on the iPad, on 2026-11-25, loaded the real brief from the
+private repository. Read aloud was silent. The night log showed the first line
+cancelled and the second with no end event. Measured on the device: an
+utterance queued in the same turn as `speechSynthesis.cancel()` is dropped, so
+the app cancels only when speech is queued and then waits before speaking. The
+iPad was also in Silent mode; whether speech plays in Silent mode is untested.
+
 Votes do not reach the task yet, so news picks use only the interests in
 MISSION.md.
 
