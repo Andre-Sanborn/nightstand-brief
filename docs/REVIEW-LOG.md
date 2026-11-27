@@ -1,6 +1,6 @@
 # Review log
 
-Last reviewed commit: e61ff6d
+Last reviewed commit: acc62dc
 
 Newest entry first.
 
@@ -16,6 +16,9 @@ Reviewer: strategy-adversary.
 - Two claims about the network secret were stated as fact. Marked as described
   by the credential tool and untested here.
 - The new narration rule and privacy: nothing found.
+
+Commit acc62dc applies these three findings and nothing else, so it is not
+reviewed again.
 
 ## 2026-11-26, project check, commit d05b7f3
 

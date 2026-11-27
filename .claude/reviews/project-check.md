@@ -38,6 +38,10 @@ commit and push. Record any changed decision in IMPLEMENTATION.md.
 A commit that changes only docs/REVIEW-LOG.md or this brief records a review
 and is not itself reviewed.
 
+A commit that only applies a review's findings, in the wording the review
+asked for, is not reviewed again. The log entry names it. Anything it changes
+beyond the findings is reviewed as usual.
+
 When there are no new commits and no uncommitted decisions, do not launch the
 adversary and change no file. Say in one line that the period had no decisions,
 and stop.
